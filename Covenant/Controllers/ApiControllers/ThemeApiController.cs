@@ -1,5 +1,5 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System.Threading.Tasks;
@@ -8,18 +8,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 
-using Covenant.Core;
-using Covenant.Models.Covenant;
+using EasyPeasy.Core;
+using EasyPeasy.Models.EasyPeasy;
 
-namespace Covenant.Controllers.ApiControllers
+namespace EasyPeasy.Controllers.ApiControllers
 {
     [ApiController, Route("api/themes"), Authorize(Policy = "RequireJwtBearer")]
     public class ThemeApiController : Controller
     {
-        private readonly ICovenantService _service;
-        private readonly UserManager<CovenantUser> _userManager;
+        private readonly IEasyPeasyService _service;
+        private readonly UserManager<EasyPeasyUser> _userManager;
 
-        public ThemeApiController(ICovenantService service, UserManager<CovenantUser> userManager)
+        public ThemeApiController(IEasyPeasyService service, UserManager<EasyPeasyUser> userManager)
         {
             _service = service;
             _userManager = userManager;

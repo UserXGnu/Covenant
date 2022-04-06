@@ -2,15 +2,15 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Identity;
-using Covenant.Models.Covenant;
+using EasyPeasy.Models.EasyPeasy;
 
-namespace Covenant.Pages
+namespace EasyPeasy.Pages
 {
     public class LogoutModel : PageModel
     {
-        private readonly SignInManager<CovenantUser> _signInManager;
+        private readonly SignInManager<EasyPeasyUser> _signInManager;
 
-        public LogoutModel(SignInManager<CovenantUser> signInManager)
+        public LogoutModel(SignInManager<EasyPeasyUser> signInManager)
         {
             _signInManager = signInManager;
         }

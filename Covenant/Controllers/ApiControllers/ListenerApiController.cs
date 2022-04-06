@@ -1,5 +1,5 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System.Threading.Tasks;
@@ -8,17 +8,17 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-using Covenant.Core;
-using Covenant.Models.Listeners;
+using EasyPeasy.Core;
+using EasyPeasy.Models.Listeners;
 
-namespace Covenant.Controllers
+namespace EasyPeasy.Controllers
 {
     [ApiController, Route("api/listeners"), Authorize(Policy = "RequireJwtBearer")]
     public class ListenerApiController : Controller
     {
-        private readonly ICovenantService _service;
+        private readonly IEasyPeasyService _service;
 
-        public ListenerApiController(ICovenantService service)
+        public ListenerApiController(IEasyPeasyService service)
         {
             _service = service;
         }

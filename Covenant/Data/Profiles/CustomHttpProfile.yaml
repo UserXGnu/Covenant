@@ -1,5 +1,5 @@
 ﻿# Author: Ryan Cobb (@cobbr_io)
-# Project: Covenant (https://github.com/cobbr/Covenant)
+# Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 # License: GNU GPLv3
 
 Name: CustomHttpProfile
@@ -17,9 +17,9 @@ MessageTransform: |
         }
     }
 HttpUrls:
-    - /en-us/index.html?page={GUID}&v=1
-    - /en-us/docs.html?type={GUID}&v=1
-    - /en-us/test.html?message={GUID}&v=1
+    - /en-us/index.html?page={ANOTHERID}&v=1
+    - /en-us/docs.html?type={ANOTHERID}&v=1
+    - /en-us/test.html?message={ANOTHERID}&v=1
 HttpRequestHeaders:
     - Name: User-Agent
       Value: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36
@@ -31,20 +31,20 @@ HttpResponseHeaders:
 HttpGetResponse: |
     <html>
         <head>
-            <title>Hello World!</title>
+            <title>Its me, Mario!</title>
         </head>
         <body>
-            <p>Hello World!</p>
-            // Hello World! {DATA}
+            <p>Its me, Mario!</p>
+            // Its me, Mario! {DATA}
         </body>
     </html>
 HttpPostResponse: |
     <html>
         <head>
-            <title>Hello World!</title>
+            <title>Its me, Mario!</title>
         </head>
         <body>
-            <p>Hello World!</p>
-            // Hello World! {DATA}
+            <p>Its me, Mario!</p>
+            // Its me, Mario! {DATA}
         </body>
     </html>

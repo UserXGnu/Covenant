@@ -1,5 +1,5 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System.Threading.Tasks;
@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authorization;
 
-using Covenant.Core;
+using EasyPeasy.Core;
 
-namespace Covenant.Hubs
+namespace EasyPeasy.Hubs
 {
     [Authorize]
     public class EventHub : Hub

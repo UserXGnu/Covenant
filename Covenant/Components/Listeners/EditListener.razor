@@ -1,18 +1,18 @@
 ﻿@page "/listener/edit/{ListenerId:int}"
-@attribute [Authorize(Roles = "User, Administrator")]
-@inherits OwningComponentBase<ICovenantService>
+@attribute [Authorize(Roles = "Administrator")]
+@inherits OwningComponentBase<IEasyPeasyService>
 
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Identity;
 @using Microsoft.Extensions.Configuration;
 
-@using Covenant.Core
-@using Covenant.Models.Covenant;
-@using Covenant.Models.Listeners;
-@using Covenant.Components.HostedFiles
+@using EasyPeasy.Core
+@using EasyPeasy.Models.EasyPeasy;
+@using EasyPeasy.Models.Listeners;
+@using EasyPeasy.Components.HostedFiles
 
 @inject IJSRuntime IJSRuntime
-@inject UserManager<CovenantUser> UserManager
+@inject UserManager<EasyPeasyUser> UserManager
 @inject IConfiguration Configuration
 @inject NavigationManager NavigationManager
 

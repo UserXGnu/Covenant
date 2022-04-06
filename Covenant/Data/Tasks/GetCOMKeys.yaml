@@ -1,0 +1,113 @@
+- Name: GetCOMKeys
+  Aliases: []
+  Author:
+    Name: Victor Flores
+    Handle: ''
+    Link: ''
+  Description: Returns x amount of COM keys and its members functions/properties (x defaults to 10)
+  Help: 
+  Language: CSharp
+  CompatibleDotNetVersions:
+  - Net35
+  - Net40
+  Code: "\nusing System;\nusing System.ServiceProcess;\nusing System.IO;\nusing System.Reflection;\nusing System.Management.Automation;\nusing System.Collections.Generic;\nusing System.Collections.ObjectModel;\nusing Microsoft.Win32;\n\nusing SharpSploit.Execution;\n\n\n\npublic static class Task\n{\n		public static string InspectCOMMembers(Type type)\n        {\n            Int32 tabs = 25;\n            string members = \"\";\n\n            foreach (MemberInfo mi in type.GetMembers())\n            {\n                \n                string Name = mi.Name;\n                string membertype = \"\";\n                string parameters = \"\";\n                string returntiype = \"\";\n               \n                if (mi.MemberType == MemberTypes.Method)\n                {\n                    membertype = \"Method\";\n\n                    foreach (ParameterInfo pi in ((MethodInfo)mi).GetParameters())\n                    {\n                        parameters=String.Format(\"{0} {1} ({2} {3});\", ((MethodInfo)mi).ReturnType.ToString(), Name, pi.ParameterType, pi.Name);\n                        \n                    }\n                    if (parameters == \"\")\n                    {\n                        parameters = String.Format(\"{0} {1} ();\", ((MethodInfo)mi).ReturnType.ToString(), Name);\n                    }\n                }\n\n                if (mi.MemberType == MemberTypes.Property)\n                {\n                    membertype = \"Property\";\n                    foreach (MethodInfo am in ((PropertyInfo)mi).GetAccessors())\n                    {\n                        parameters = String.Format(\"{0}\", am);\n                    }\n                }\n                string member = String.Format(\"{0}{1}{2}{3}{4}{5}\", Name,\n                    new String(' ', tabs - Name.Length),\n                    membertype, new String(' ', (tabs - membertype.Length) / 2),\n                    parameters, Environment.NewLine);\n\n                members = members + member;\n            }\n            return members;\n        }\n        static string GetKeys(string path, string amount = \"10\")\n        {\n        	Int32 _amount = Int32.Parse(amount);\n            RegistryKey rkey = Registry.ClassesRoot.OpenSubKey(path);\n            // Retrieve all the subkeys for the specified key.\n            String[] names = rkey.GetSubKeyNames();\n\n            int icount = 0;\n\n            Console.WriteLine(\"Subkeys of \" + rkey.Name);\n            Console.WriteLine(\"-----------------------------------------------\");\n            String output = \"\";\n         \n            foreach (String s in names)\n            {\n                Int32 i = 0;\n                if (icount == 0)\n                {\n                    icount++;\n                    continue;\n                }\n\n                try\n                {\n                 \n                    var type = System.Type.GetTypeFromCLSID(new Guid(s.Trim()));\n                    object item = System.Activator.CreateInstance(type);\n                    output += String.Format(\"\\t{0}\" + Environment.NewLine + \"\\tType: {1}{2}\", s, type.Name, Environment.NewLine);                 \n                    output = output + String.Format(\"Name\\t\\t\\tMemberType\\t\\tDefinition\" \n                        + Environment.NewLine \n                        + new string('-', 60) \n                        + Environment.NewLine);\n                \n                    output = output + InspectCOMMembers(item.GetType());\n                    output = output +  Environment.NewLine;\n\n                }\n                catch (Exception e)\n                {\n                    continue;\n                }\n\n                if (icount >= _amount)\n                    break;\n                icount++;\n            }\n            return output;\n        }\n\n    public static string Execute(string path, string amount)\n    {\n        try\n        {\n            return GetKeys(path, amount);\n        }\n        catch (Exception e) { return e.GetType().FullName + \": \" + e.Message + Environment.NewLine + e.StackTrace; }\n    }\n}"
+  TaskingType: Assembly
+  UnsafeCompile: false
+  TokenTask: false
+  Options:
+  - Name: path
+    Value: ''
+    DefaultValue: ''
+    Description: ''
+    SuggestedValues:
+    - CLSID
+    Optional: false
+    DisplayInCommand: true
+    FileOption: false
+  - Name: amount
+    Value: ''
+    DefaultValue: 10
+    Description: ''
+    SuggestedValues:
+    - 10
+    Optional: true
+    DisplayInCommand: true
+    FileOption: false
+  ReferenceSourceLibraries:
+  - Name: SharpSploit
+    Description: SharpSploit is a library for C# post-exploitation modules.
+    Location: SharpSploit/SharpSploit/
+    Language: CSharp
+    CompatibleDotNetVersions:
+    - Net35
+    - Net40
+    ReferenceAssemblies:
+    - Name: System.Windows.Forms.dll
+      Location: net35/System.Windows.Forms.dll
+      DotNetVersion: Net35
+    - Name: System.Management.dll
+      Location: net40/System.Management.dll
+      DotNetVersion: Net40
+    - Name: System.ServiceProcess.dll
+      Location: net40/System.ServiceProcess.dll
+      DotNetVersion: Net40
+    - Name: System.DirectoryServices.Protocols.dll
+      Location: net40/System.DirectoryServices.Protocols.dll
+      DotNetVersion: Net40
+    - Name: System.IdentityModel.dll
+      Location: net40/System.IdentityModel.dll
+      DotNetVersion: Net40
+    - Name: System.Core.dll
+      Location: net40/System.Core.dll
+      DotNetVersion: Net40
+    - Name: System.Windows.Forms.dll
+      Location: net40/System.Windows.Forms.dll
+      DotNetVersion: Net40
+    - Name: System.DirectoryServices.dll
+      Location: net40/System.DirectoryServices.dll
+      DotNetVersion: Net40
+    - Name: mscorlib.dll
+      Location: net40/mscorlib.dll
+      DotNetVersion: Net40
+    - Name: System.dll
+      Location: net40/System.dll
+      DotNetVersion: Net40
+    - Name: System.XML.dll
+      Location: net35/System.XML.dll
+      DotNetVersion: Net35
+    - Name: System.Management.Automation.dll
+      Location: net35/System.Management.Automation.dll
+      DotNetVersion: Net35
+    - Name: System.dll
+      Location: net35/System.dll
+      DotNetVersion: Net35
+    - Name: System.Core.dll
+      Location: net35/System.Core.dll
+      DotNetVersion: Net35
+    - Name: System.IdentityModel.dll
+      Location: net35/System.IdentityModel.dll
+      DotNetVersion: Net35
+    - Name: System.DirectoryServices.Protocols.dll
+      Location: net35/System.DirectoryServices.Protocols.dll
+      DotNetVersion: Net35
+    - Name: System.ServiceProcess.dll
+      Location: net35/System.ServiceProcess.dll
+      DotNetVersion: Net35
+    - Name: System.Management.dll
+      Location: net35/System.Management.dll
+      DotNetVersion: Net35
+    - Name: System.DirectoryServices.dll
+      Location: net35/System.DirectoryServices.dll
+      DotNetVersion: Net35
+    - Name: mscorlib.dll
+      Location: net35/mscorlib.dll
+      DotNetVersion: Net35
+    - Name: System.Management.Automation.dll
+      Location: net40/System.Management.Automation.dll
+      DotNetVersion: Net40
+    - Name: System.XML.dll
+      Location: net40/System.XML.dll
+      DotNetVersion: Net40
+    EmbeddedResources: []
+  ReferenceAssemblies: []
+  EmbeddedResources: []

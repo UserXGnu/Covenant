@@ -1,5 +1,5 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System.Collections.Generic;
@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-using Covenant.Core;
-using Covenant.Models.Grunts;
+using EasyPeasy.Core;
+using EasyPeasy.Models.Grawls;
 
-namespace Covenant.Controllers
+namespace EasyPeasy.Controllers
 {
     [ApiController, Route("api/commandoutputs"), Authorize(Policy = "RequireJwtBearer")]
     public class CommandOutputApiController : Controller
     {
-        private readonly ICovenantService _service;
+        private readonly IEasyPeasyService _service;
 
-        public CommandOutputApiController(ICovenantService service)
+        public CommandOutputApiController(IEasyPeasyService service)
         {
             _service = service;
         }
@@ -124,7 +124,7 @@ namespace Covenant.Controllers
 
         // DELETE api/commandoutputs/{id}
         // <summary>
-        // Delete a GruntTasking
+        // Delete a GrawlTasking
         // </summary>
         [HttpDelete("{id}", Name = "DeleteCommandOutput")]
         [ProducesResponseType(204)]

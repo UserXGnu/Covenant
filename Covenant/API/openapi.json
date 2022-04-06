@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Covenant API",
+    "title": "EasyPeasy API",
     "version": "v0.1"
   },
   "paths": {
@@ -185,7 +185,7 @@
     "/api/users": {
       "get": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "GetUsers",
         "produces": [
@@ -199,7 +199,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/CovenantUser"
+                "$ref": "#/definitions/EasyPeasyUser"
               }
             }
           }
@@ -207,7 +207,7 @@
       },
       "post": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "CreateUser",
         "consumes": [
@@ -226,7 +226,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/CovenantUserRegister"
+              "$ref": "#/definitions/EasyPeasyUserRegister"
             }
           }
         ],
@@ -234,14 +234,14 @@
           "201": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/CovenantUser"
+              "$ref": "#/definitions/EasyPeasyUser"
             }
           }
         }
       },
       "put": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "EditUser",
         "consumes": [
@@ -260,7 +260,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/CovenantUser"
+              "$ref": "#/definitions/EasyPeasyUser"
             }
           }
         ],
@@ -268,7 +268,7 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/CovenantUser"
+              "$ref": "#/definitions/EasyPeasyUser"
             }
           }
         }
@@ -277,7 +277,7 @@
     "/api/users/{id}": {
       "get": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "GetUser",
         "produces": [
@@ -297,14 +297,14 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/CovenantUser"
+              "$ref": "#/definitions/EasyPeasyUser"
             }
           }
         }
       },
       "delete": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "DeleteUser",
         "parameters": [
@@ -325,7 +325,7 @@
     "/api/users/current": {
       "get": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "GetCurrentUser",
         "produces": [
@@ -337,7 +337,7 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/CovenantUser"
+              "$ref": "#/definitions/EasyPeasyUser"
             }
           }
         }
@@ -346,7 +346,7 @@
     "/api/users/login": {
       "post": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "Login",
         "consumes": [
@@ -365,7 +365,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/CovenantUserLogin"
+              "$ref": "#/definitions/EasyPeasyUserLogin"
             }
           }
         ],
@@ -373,7 +373,7 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/CovenantUserLoginResult"
+              "$ref": "#/definitions/EasyPeasyUserLoginResult"
             }
           }
         }
@@ -382,7 +382,7 @@
     "/api/users/logon": {
       "put": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "EditUserPassword",
         "consumes": [
@@ -401,7 +401,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/CovenantUserLogin"
+              "$ref": "#/definitions/EasyPeasyUserLogin"
             }
           }
         ],
@@ -409,7 +409,7 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/CovenantUser"
+              "$ref": "#/definitions/EasyPeasyUser"
             }
           }
         }
@@ -418,7 +418,7 @@
     "/api/users/roles": {
       "get": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "GetUsersRoles",
         "produces": [
@@ -442,7 +442,7 @@
     "/api/users/{id}/roles": {
       "get": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "GetUserRoles",
         "produces": [
@@ -474,7 +474,7 @@
     "/api/users/{id}/roles/{rid}": {
       "get": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "GetUserRole",
         "produces": [
@@ -507,7 +507,7 @@
       },
       "post": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "CreateUserRole",
         "produces": [
@@ -540,7 +540,7 @@
       },
       "delete": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "DeleteUserRole",
         "parameters": [
@@ -567,7 +567,7 @@
     "/api/roles": {
       "get": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "GetRoles",
         "produces": [
@@ -591,7 +591,7 @@
     "/api/roles/{rid}": {
       "get": {
         "tags": [
-          "CovenantUserApi"
+          "EasyPeasyUserApi"
         ],
         "operationId": "GetRole",
         "produces": [
@@ -1478,12 +1478,12 @@
         }
       }
     },
-    "/api/grunts": {
+    "/api/grawls": {
       "get": {
         "tags": [
-          "GruntApi"
+          "GrawlApi"
         ],
-        "operationId": "GetGrunts",
+        "operationId": "GetGrawls",
         "produces": [
           "text/plain",
           "application/json",
@@ -1495,7 +1495,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Grunt"
+                "$ref": "#/definitions/Grawl"
               }
             }
           }
@@ -1503,9 +1503,9 @@
       },
       "post": {
         "tags": [
-          "GruntApi"
+          "GrawlApi"
         ],
-        "operationId": "CreateGrunt",
+        "operationId": "CreateGrawl",
         "consumes": [
           "application/json-patch+json",
           "application/json",
@@ -1522,7 +1522,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Grunt"
+              "$ref": "#/definitions/Grawl"
             }
           }
         ],
@@ -1530,16 +1530,16 @@
           "201": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/Grunt"
+              "$ref": "#/definitions/Grawl"
             }
           }
         }
       },
       "put": {
         "tags": [
-          "GruntApi"
+          "GrawlApi"
         ],
-        "operationId": "EditGrunt",
+        "operationId": "EditGrawl",
         "consumes": [
           "application/json-patch+json",
           "application/json",
@@ -1556,7 +1556,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/Grunt"
+              "$ref": "#/definitions/Grawl"
             }
           }
         ],
@@ -1564,18 +1564,18 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/Grunt"
+              "$ref": "#/definitions/Grawl"
             }
           }
         }
       }
     },
-    "/api/grunts/{id}": {
+    "/api/grawls/{id}": {
       "get": {
         "tags": [
-          "GruntApi"
+          "GrawlApi"
         ],
-        "operationId": "GetGrunt",
+        "operationId": "GetGrawl",
         "produces": [
           "text/plain",
           "application/json",
@@ -1594,16 +1594,16 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/Grunt"
+              "$ref": "#/definitions/Grawl"
             }
           }
         }
       },
       "delete": {
         "tags": [
-          "GruntApi"
+          "GrawlApi"
         ],
-        "operationId": "DeleteGrunt",
+        "operationId": "DeleteGrawl",
         "parameters": [
           {
             "in": "path",
@@ -1620,12 +1620,12 @@
         }
       }
     },
-    "/api/grunts/{name}": {
+    "/api/grawls/{name}": {
       "get": {
         "tags": [
-          "GruntApi"
+          "GrawlApi"
         ],
-        "operationId": "GetGruntByName",
+        "operationId": "GetGrawlByName",
         "produces": [
           "text/plain",
           "application/json",
@@ -1643,18 +1643,18 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/Grunt"
+              "$ref": "#/definitions/Grawl"
             }
           }
         }
       }
     },
-    "/api/grunts/guid/{guid}": {
+    "/api/grawls/anotherid/{anotherid}": {
       "get": {
         "tags": [
-          "GruntApi"
+          "GrawlApi"
         ],
-        "operationId": "GetGruntByGUID",
+        "operationId": "GetGrawlByANOTHERID",
         "produces": [
           "text/plain",
           "application/json",
@@ -1663,7 +1663,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "guid",
+            "name": "anotherid",
             "required": true,
             "type": "string"
           }
@@ -1672,18 +1672,18 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/Grunt"
+              "$ref": "#/definitions/Grawl"
             }
           }
         }
       }
     },
-    "/api/grunts/originalguid/{serverguid}": {
+    "/api/grawls/originalanotherid/{serveranotherid}": {
       "get": {
         "tags": [
-          "GruntApi"
+          "GrawlApi"
         ],
-        "operationId": "GetGruntByOriginalServerGUID",
+        "operationId": "GetGrawlByOriginalServerANOTHERID",
         "produces": [
           "text/plain",
           "application/json",
@@ -1692,7 +1692,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "serverguid",
+            "name": "serveranotherid",
             "required": true,
             "type": "string"
           }
@@ -1701,18 +1701,18 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/Grunt"
+              "$ref": "#/definitions/Grawl"
             }
           }
         }
       }
     },
-    "/api/grunts/{id}/path/{cid}": {
+    "/api/grawls/{id}/path/{cid}": {
       "get": {
         "tags": [
-          "GruntApi"
+          "GrawlApi"
         ],
-        "operationId": "GetPathToChildGrunt",
+        "operationId": "GetPathToChildGrawl",
         "produces": [
           "text/plain",
           "application/json",
@@ -1747,12 +1747,12 @@
         }
       }
     },
-    "/api/grunts/{id}/outbound": {
+    "/api/grawls/{id}/outbound": {
       "get": {
         "tags": [
-          "GruntApi"
+          "GrawlApi"
         ],
-        "operationId": "GetOutboundGrunt",
+        "operationId": "GetOutboundGrawl",
         "produces": [
           "text/plain",
           "application/json",
@@ -1771,18 +1771,18 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/Grunt"
+              "$ref": "#/definitions/Grawl"
             }
           }
         }
       }
     },
-    "/api/grunts/{id}/interact": {
+    "/api/grawls/{id}/interact": {
       "post": {
         "tags": [
-          "GruntApi"
+          "GrawlApi"
         ],
-        "operationId": "InteractGrunt",
+        "operationId": "InteractGrawl",
         "consumes": [
           "application/json-patch+json",
           "application/json",
@@ -1814,18 +1814,18 @@
           "201": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/GruntCommand"
+              "$ref": "#/definitions/GrawlCommand"
             }
           }
         }
       }
     },
-    "/api/grunts/{id}/compileexecutor": {
+    "/api/grawls/{id}/compileexecutor": {
       "get": {
         "tags": [
-          "GruntApi"
+          "GrawlApi"
         ],
-        "operationId": "CompileGruntExecutor",
+        "operationId": "CompileGrawlExecutor",
         "produces": [
           "text/plain",
           "application/json",
@@ -1854,9 +1854,9 @@
     "/api/commands": {
       "get": {
         "tags": [
-          "GruntCommandApi"
+          "GrawlCommandApi"
         ],
-        "operationId": "GetGruntCommands",
+        "operationId": "GetGrawlCommands",
         "produces": [
           "text/plain",
           "application/json",
@@ -1868,7 +1868,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/GruntCommand"
+                "$ref": "#/definitions/GrawlCommand"
               }
             }
           }
@@ -1876,9 +1876,9 @@
       },
       "post": {
         "tags": [
-          "GruntCommandApi"
+          "GrawlCommandApi"
         ],
-        "operationId": "CreateGruntCommand",
+        "operationId": "CreateGrawlCommand",
         "consumes": [
           "application/json-patch+json",
           "application/json",
@@ -1895,7 +1895,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/GruntCommand"
+              "$ref": "#/definitions/GrawlCommand"
             }
           }
         ],
@@ -1903,16 +1903,16 @@
           "201": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/GruntCommand"
+              "$ref": "#/definitions/GrawlCommand"
             }
           }
         }
       },
       "put": {
         "tags": [
-          "GruntCommandApi"
+          "GrawlCommandApi"
         ],
-        "operationId": "EditGruntCommand",
+        "operationId": "EditGrawlCommand",
         "consumes": [
           "application/json-patch+json",
           "application/json",
@@ -1929,7 +1929,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/GruntCommand"
+              "$ref": "#/definitions/GrawlCommand"
             }
           }
         ],
@@ -1937,7 +1937,7 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/GruntCommand"
+              "$ref": "#/definitions/GrawlCommand"
             }
           }
         }
@@ -1946,9 +1946,9 @@
     "/api/commands/{id}": {
       "get": {
         "tags": [
-          "GruntCommandApi"
+          "GrawlCommandApi"
         ],
-        "operationId": "GetGruntCommand",
+        "operationId": "GetGrawlCommand",
         "produces": [
           "text/plain",
           "application/json",
@@ -1967,16 +1967,16 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/GruntCommand"
+              "$ref": "#/definitions/GrawlCommand"
             }
           }
         }
       },
       "delete": {
         "tags": [
-          "GruntCommandApi"
+          "GrawlCommandApi"
         ],
-        "operationId": "DeleteGruntCommand",
+        "operationId": "DeleteGrawlCommand",
         "parameters": [
           {
             "in": "path",
@@ -1993,12 +1993,12 @@
         }
       }
     },
-    "/api/grunttasks": {
+    "/api/grawltasks": {
       "get": {
         "tags": [
-          "GruntTaskApi"
+          "GrawlTaskApi"
         ],
-        "operationId": "GetGruntTasks",
+        "operationId": "GetGrawlTasks",
         "produces": [
           "text/plain",
           "application/json",
@@ -2010,7 +2010,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/GruntTask"
+                "$ref": "#/definitions/GrawlTask"
               }
             }
           }
@@ -2018,9 +2018,9 @@
       },
       "post": {
         "tags": [
-          "GruntTaskApi"
+          "GrawlTaskApi"
         ],
-        "operationId": "CreateGruntTask",
+        "operationId": "CreateGrawlTask",
         "consumes": [
           "application/json-patch+json",
           "application/json",
@@ -2037,7 +2037,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/GruntTask"
+              "$ref": "#/definitions/GrawlTask"
             }
           }
         ],
@@ -2045,16 +2045,16 @@
           "201": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/GruntTask"
+              "$ref": "#/definitions/GrawlTask"
             }
           }
         }
       },
       "put": {
         "tags": [
-          "GruntTaskApi"
+          "GrawlTaskApi"
         ],
-        "operationId": "EditGruntTask",
+        "operationId": "EditGrawlTask",
         "consumes": [
           "application/json-patch+json",
           "application/json",
@@ -2071,7 +2071,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/GruntTask"
+              "$ref": "#/definitions/GrawlTask"
             }
           }
         ],
@@ -2079,18 +2079,18 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/GruntTask"
+              "$ref": "#/definitions/GrawlTask"
             }
           }
         }
       }
     },
-    "/api/grunttasks/{id}": {
+    "/api/grawltasks/{id}": {
       "get": {
         "tags": [
-          "GruntTaskApi"
+          "GrawlTaskApi"
         ],
-        "operationId": "GetGruntTask",
+        "operationId": "GetGrawlTask",
         "produces": [
           "text/plain",
           "application/json",
@@ -2109,16 +2109,16 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/GruntTask"
+              "$ref": "#/definitions/GrawlTask"
             }
           }
         }
       },
       "delete": {
         "tags": [
-          "GruntTaskApi"
+          "GrawlTaskApi"
         ],
-        "operationId": "DeleteGruntTask",
+        "operationId": "DeleteGrawlTask",
         "parameters": [
           {
             "in": "path",
@@ -2138,9 +2138,9 @@
     "/api/taskings": {
       "get": {
         "tags": [
-          "GruntTaskingApi"
+          "GrawlTaskingApi"
         ],
-        "operationId": "GetAllGruntTaskings",
+        "operationId": "GetAllGrawlTaskings",
         "produces": [
           "text/plain",
           "application/json",
@@ -2152,7 +2152,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/GruntTasking"
+                "$ref": "#/definitions/GrawlTasking"
               }
             }
           }
@@ -2160,9 +2160,9 @@
       },
       "post": {
         "tags": [
-          "GruntTaskingApi"
+          "GrawlTaskingApi"
         ],
-        "operationId": "CreateGruntTasking",
+        "operationId": "CreateGrawlTasking",
         "consumes": [
           "application/json-patch+json",
           "application/json",
@@ -2179,7 +2179,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/GruntTasking"
+              "$ref": "#/definitions/GrawlTasking"
             }
           }
         ],
@@ -2187,16 +2187,16 @@
           "201": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/GruntTasking"
+              "$ref": "#/definitions/GrawlTasking"
             }
           }
         }
       },
       "put": {
         "tags": [
-          "GruntTaskingApi"
+          "GrawlTaskingApi"
         ],
-        "operationId": "EditGruntTasking",
+        "operationId": "EditGrawlTasking",
         "consumes": [
           "application/json-patch+json",
           "application/json",
@@ -2213,7 +2213,7 @@
             "in": "body",
             "name": "body",
             "schema": {
-              "$ref": "#/definitions/GruntTasking"
+              "$ref": "#/definitions/GrawlTasking"
             }
           }
         ],
@@ -2221,18 +2221,18 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/GruntTasking"
+              "$ref": "#/definitions/GrawlTasking"
             }
           }
         }
       }
     },
-    "/api/grunts/{id}/taskings": {
+    "/api/grawls/{id}/taskings": {
       "get": {
         "tags": [
-          "GruntTaskingApi"
+          "GrawlTaskingApi"
         ],
-        "operationId": "GetGruntTaskings",
+        "operationId": "GetGrawlTaskings",
         "produces": [
           "text/plain",
           "application/json",
@@ -2253,19 +2253,19 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/GruntTasking"
+                "$ref": "#/definitions/GrawlTasking"
               }
             }
           }
         }
       }
     },
-    "/api/grunts/{id}/taskings/search": {
+    "/api/grawls/{id}/taskings/search": {
       "get": {
         "tags": [
-          "GruntTaskingApi"
+          "GrawlTaskingApi"
         ],
-        "operationId": "GetSearchGruntTaskings",
+        "operationId": "GetSearchGrawlTaskings",
         "produces": [
           "text/plain",
           "application/json",
@@ -2286,19 +2286,19 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/GruntTasking"
+                "$ref": "#/definitions/GrawlTasking"
               }
             }
           }
         }
       }
     },
-    "/api/grunts/{id}/taskings/uninitialized": {
+    "/api/grawls/{id}/taskings/uninitialized": {
       "get": {
         "tags": [
-          "GruntTaskingApi"
+          "GrawlTaskingApi"
         ],
-        "operationId": "GetUninitializedGruntTaskings",
+        "operationId": "GetUninitializedGrawlTaskings",
         "produces": [
           "text/plain",
           "application/json",
@@ -2319,19 +2319,19 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/GruntTasking"
+                "$ref": "#/definitions/GrawlTasking"
               }
             }
           }
         }
       }
     },
-    "/api/grunts/{id}/taskings/search/uninitialized": {
+    "/api/grawls/{id}/taskings/search/uninitialized": {
       "get": {
         "tags": [
-          "GruntTaskingApi"
+          "GrawlTaskingApi"
         ],
-        "operationId": "GetSearchUninitializedGruntTaskings",
+        "operationId": "GetSearchUninitializedGrawlTaskings",
         "produces": [
           "text/plain",
           "application/json",
@@ -2352,7 +2352,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/GruntTasking"
+                "$ref": "#/definitions/GrawlTasking"
               }
             }
           }
@@ -2362,9 +2362,9 @@
     "/api/taskings/{tid}": {
       "get": {
         "tags": [
-          "GruntTaskingApi"
+          "GrawlTaskingApi"
         ],
-        "operationId": "GetGruntTasking",
+        "operationId": "GetGrawlTasking",
         "produces": [
           "text/plain",
           "application/json",
@@ -2383,16 +2383,16 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/GruntTasking"
+              "$ref": "#/definitions/GrawlTasking"
             }
           }
         }
       },
       "delete": {
         "tags": [
-          "GruntTaskingApi"
+          "GrawlTaskingApi"
         ],
-        "operationId": "DeleteGruntTasking",
+        "operationId": "DeleteGrawlTasking",
         "parameters": [
           {
             "in": "path",
@@ -2409,12 +2409,12 @@
         }
       }
     },
-    "/api/grunts/taskings/{taskingname}": {
+    "/api/grawls/taskings/{taskingname}": {
       "get": {
         "tags": [
-          "GruntTaskingApi"
+          "GrawlTaskingApi"
         ],
-        "operationId": "GetGruntTaskingByName",
+        "operationId": "GetGrawlTaskingByName",
         "produces": [
           "text/plain",
           "application/json",
@@ -2432,7 +2432,7 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/GruntTasking"
+              "$ref": "#/definitions/GrawlTasking"
             }
           }
         }
@@ -5313,7 +5313,7 @@
   "definitions": {
     "CommandOutput": {
       "required": [
-        "gruntCommandId"
+        "grawlCommandId"
       ],
       "type": "object",
       "properties": {
@@ -5324,7 +5324,7 @@
         "output": {
           "type": "string"
         },
-        "gruntCommandId": {
+        "grawlCommandId": {
           "format": "int32",
           "type": "integer"
         }
@@ -5438,7 +5438,7 @@
         }
       }
     },
-    "CovenantUser": {
+    "EasyPeasyUser": {
       "type": "object",
       "properties": {
         "themeId": {
@@ -5497,7 +5497,7 @@
         }
       }
     },
-    "CovenantUserRegister": {
+    "EasyPeasyUserRegister": {
       "required": [
         "confirmPassword",
         "password",
@@ -5519,7 +5519,7 @@
         }
       }
     },
-    "CovenantUserLogin": {
+    "EasyPeasyUserLogin": {
       "required": [
         "password",
         "userName"
@@ -5537,7 +5537,7 @@
         }
       }
     },
-    "CovenantUserLoginResult": {
+    "EasyPeasyUserLoginResult": {
       "type": "object",
       "properties": {
         "success": {
@@ -5972,7 +5972,7 @@
         "connectAddresses",
         "connectPort",
         "description",
-        "guid",
+        "anotherid",
         "listenerTypeId",
         "name",
         "profileId",
@@ -5989,7 +5989,7 @@
           "minLength": 0,
           "type": "string"
         },
-        "guid": {
+        "anotherid": {
           "maxLength": 100,
           "minLength": 0,
           "pattern": "^[a-zA-Z0-9]*$",
@@ -6087,7 +6087,7 @@
         "modelAsString": false
       }
     },
-    "GruntStatus": {
+    "GrawlStatus": {
       "enum": [
         "Uninitialized",
         "Stage0",
@@ -6101,7 +6101,7 @@
       ],
       "type": "string",
       "x-ms-enum": {
-        "name": "GruntStatus",
+        "name": "GrawlStatus",
         "modelAsString": false
       }
     },
@@ -6119,7 +6119,7 @@
         "modelAsString": false
       }
     },
-    "GruntTaskAuthor": {
+    "GrawlTaskAuthor": {
       "type": "object",
       "properties": {
         "id": {
@@ -6135,20 +6135,20 @@
         "link": {
           "type": "string"
         },
-        "gruntTasks": {
+        "grawlTasks": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/GruntTask"
+            "$ref": "#/definitions/GrawlTask"
           }
         }
       }
     },
-    "GruntTaskingType": {
+    "GrawlTaskingType": {
       "enum": [
         "Assembly",
         "SetDelay",
-        "SetJitter",
-        "SetConnectAttempts",
+        "SetJItter",
+        "SetConneCTAttEmpts",
         "SetKillDate",
         "Exit",
         "Connect",
@@ -6158,7 +6158,7 @@
       ],
       "type": "string",
       "x-ms-enum": {
-        "name": "GruntTaskingType",
+        "name": "GrawlTaskingType",
         "modelAsString": false
       }
     },
@@ -6221,7 +6221,7 @@
         }
       }
     },
-    "GruntTaskOption": {
+    "GrawlTaskOption": {
       "type": "object",
       "properties": {
         "id": {
@@ -6255,13 +6255,13 @@
         "fileOption": {
           "type": "boolean"
         },
-        "gruntTaskId": {
+        "grawlTaskId": {
           "format": "int32",
           "type": "integer"
         }
       }
     },
-    "GruntTask": {
+    "GrawlTask": {
       "required": [
         "name"
       ],
@@ -6276,7 +6276,7 @@
           "type": "integer"
         },
         "author": {
-          "$ref": "#/definitions/GruntTaskAuthor"
+          "$ref": "#/definitions/GrawlTaskAuthor"
         },
         "name": {
           "type": "string"
@@ -6309,7 +6309,7 @@
           "type": "boolean"
         },
         "taskingType": {
-          "$ref": "#/definitions/GruntTaskingType"
+          "$ref": "#/definitions/GrawlTaskingType"
         },
         "referenceSourceLibraries": {
           "type": "array",
@@ -6341,12 +6341,12 @@
         "options": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/GruntTaskOption"
+            "$ref": "#/definitions/GrawlTaskOption"
           }
         }
       }
     },
-    "GruntTaskingStatus": {
+    "GrawlTaskingStatus": {
       "enum": [
         "Uninitialized",
         "Tasked",
@@ -6356,14 +6356,14 @@
       ],
       "type": "string",
       "x-ms-enum": {
-        "name": "GruntTaskingStatus",
+        "name": "GrawlTaskingStatus",
         "modelAsString": false
       }
     },
-    "GruntTasking": {
+    "GrawlTasking": {
       "required": [
-        "gruntId",
-        "gruntTaskId",
+        "grawlId",
+        "grawlTaskId",
         "name"
       ],
       "type": "object",
@@ -6375,22 +6375,22 @@
         "name": {
           "type": "string"
         },
-        "gruntId": {
+        "grawlId": {
           "format": "int32",
           "type": "integer"
         },
-        "grunt": {
-          "$ref": "#/definitions/Grunt"
+        "grawl": {
+          "$ref": "#/definitions/Grawl"
         },
-        "gruntTaskId": {
+        "grawlTaskId": {
           "format": "int32",
           "type": "integer"
         },
-        "gruntTask": {
-          "$ref": "#/definitions/GruntTask"
+        "grawlTask": {
+          "$ref": "#/definitions/GrawlTask"
         },
         "type": {
-          "$ref": "#/definitions/GruntTaskingType"
+          "$ref": "#/definitions/GrawlTaskingType"
         },
         "parameters": {
           "type": "array",
@@ -6399,7 +6399,7 @@
           }
         },
         "status": {
-          "$ref": "#/definitions/GruntTaskingStatus"
+          "$ref": "#/definitions/GrawlTaskingStatus"
         },
         "taskingTime": {
           "format": "date-time",
@@ -6409,13 +6409,13 @@
           "format": "date-time",
           "type": "string"
         },
-        "gruntCommandId": {
+        "grawlCommandId": {
           "format": "int32",
           "type": "integer"
         }
       }
     },
-    "GruntCommand": {
+    "GrawlCommand": {
       "required": [
         "command",
         "commandOutputId",
@@ -6446,22 +6446,22 @@
           "type": "string"
         },
         "user": {
-          "$ref": "#/definitions/CovenantUser"
+          "$ref": "#/definitions/EasyPeasyUser"
         },
-        "gruntTaskingId": {
+        "grawlTaskingId": {
           "format": "int32",
           "type": "integer"
         },
-        "gruntTasking": {
-          "$ref": "#/definitions/GruntTasking"
+        "grawlTasking": {
+          "$ref": "#/definitions/GrawlTasking"
         },
-        "gruntId": {
+        "grawlId": {
           "format": "int32",
           "type": "integer"
         }
       }
     },
-    "Grunt": {
+    "Grawl": {
       "required": [
         "connectAttempts",
         "delay",
@@ -6490,7 +6490,7 @@
         "originalServerGuid": {
           "type": "string"
         },
-        "guid": {
+        "anotherid": {
           "type": "string"
         },
         "children": {
@@ -6554,7 +6554,7 @@
           "$ref": "#/definitions/RuntimeIdentifier"
         },
         "status": {
-          "$ref": "#/definitions/GruntStatus"
+          "$ref": "#/definitions/GrawlStatus"
         },
         "integrity": {
           "$ref": "#/definitions/IntegrityLevel"
@@ -6577,16 +6577,16 @@
         "operatingSystem": {
           "type": "string"
         },
-        "gruntSharedSecretPassword": {
+        "grawlSharedSecretPassword": {
           "type": "string"
         },
-        "gruntRSAPublicKey": {
+        "grawlRSAPublicKey": {
           "type": "string"
         },
-        "gruntNegotiatedSessionKey": {
+        "grawlNegotiatedSessKEy": {
           "type": "string"
         },
-        "gruntChallenge": {
+        "grawlChallenge": {
           "type": "string"
         },
         "activationTime": {
@@ -6600,10 +6600,10 @@
         "powerShellImport": {
           "type": "string"
         },
-        "gruntCommands": {
+        "grawlCommands": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/GruntCommand"
+            "$ref": "#/definitions/GrawlCommand"
           }
         }
       }
@@ -7607,7 +7607,7 @@
         "connectAddresses",
         "connectPort",
         "description",
-        "guid",
+        "anotherid",
         "listenerTypeId",
         "name",
         "profileId",
@@ -7644,7 +7644,7 @@
           "minLength": 0,
           "type": "string"
         },
-        "guid": {
+        "anotherid": {
           "maxLength": 100,
           "minLength": 0,
           "pattern": "^[a-zA-Z0-9]*$",
@@ -7711,7 +7711,7 @@
         "connectAddresses",
         "connectPort",
         "description",
-        "guid",
+        "anotherid",
         "listenerTypeId",
         "name",
         "profileId",
@@ -7737,7 +7737,7 @@
           "minLength": 0,
           "type": "string"
         },
-        "guid": {
+        "anotherid": {
           "maxLength": 100,
           "minLength": 0,
           "pattern": "^[a-zA-Z0-9]*$",

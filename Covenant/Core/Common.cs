@@ -1,5 +1,5 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System;
@@ -11,75 +11,75 @@ using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 
-namespace Covenant.Core
+namespace EasyPeasy.Core
 {
     public static class Common
     {
-        public static int CovenantDefaultAdminPort = 7443;
+        public static int EasyPeasyDefaultAdminPort = 7443;
 
-        public static Encoding CovenantEncoding = Encoding.UTF8;
+        public static Encoding EasyPeasyEncoding = Encoding.UTF8;
         public static int AesIVLength = 16;
         public static CipherMode AesCipherMode = CipherMode.CBC;
         public static PaddingMode AesPaddingMode = PaddingMode.PKCS7;
 
-        public static string CovenantDirectory = Assembly.GetExecutingAssembly().Location.Split("bin")[0].Split("Covenant.dll")[0];
-        public static string CovenantDataDirectory = CovenantDirectory + "Data" + Path.DirectorySeparatorChar;
-        public static string CovenantDatabaseFile = CovenantDataDirectory + "covenant.db";
-        public static string CovenantTempDirectory = CovenantDataDirectory + "Temp" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyDirectory = Assembly.GetExecutingAssembly().Location.Split("bin")[0].Split("EasyPeasy.dll")[0];
+        public static string EasyPeasyDataDirectory = EasyPeasyDirectory + "Data" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyDatabaseFile = EasyPeasyDataDirectory + "covenant.db";
+        public static string EasyPeasyTempDirectory = EasyPeasyDataDirectory + "Temp" + Path.DirectorySeparatorChar;
 
-        public static string CovenantProfileDirectory = CovenantDataDirectory + "Profiles" + Path.DirectorySeparatorChar;
-        public static string CovenantDefaultHttpProfile = CovenantProfileDirectory + "DefaultHttpProfile.yaml";
+        public static string EasyPeasyProfileDirectory = EasyPeasyDataDirectory + "Profiles" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyDefaultHttpProfile = EasyPeasyProfileDirectory + "DefaultHttpProfile.yaml";
 
-        public static string CovenantDownloadDirectory = CovenantDataDirectory + "Downloads" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyDownloadDirectory = EasyPeasyDataDirectory + "Downloads" + Path.DirectorySeparatorChar;
 
-        public static string CovenantAssemblyReferenceDirectory = CovenantDataDirectory + "AssemblyReferences" + Path.DirectorySeparatorChar;
-        public static string CovenantAssemblyReferenceNet35Directory = CovenantAssemblyReferenceDirectory + "net35" + Path.DirectorySeparatorChar;
-        public static string CovenantAssemblyReferenceNet40Directory = CovenantAssemblyReferenceDirectory + "net40" + Path.DirectorySeparatorChar;
-        public static string CovenantEmbeddedResourcesDirectory = CovenantDataDirectory + "EmbeddedResources" + Path.DirectorySeparatorChar;
-        public static string CovenantReferenceSourceLibraries = CovenantDataDirectory + "ReferenceSourceLibraries" + Path.DirectorySeparatorChar;
-        public static string CovenantSharpSploitDirectory = CovenantReferenceSourceLibraries + "SharpSploit" + Path.DirectorySeparatorChar;
-        public static string CovenantRubeusDirectory = CovenantReferenceSourceLibraries + "Rubeus" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyAssemblyReferenceDirectory = EasyPeasyDataDirectory + "AssemblyReferences" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyAssemblyReferenceNet35Directory = EasyPeasyAssemblyReferenceDirectory + "net35" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyAssemblyReferenceNet40Directory = EasyPeasyAssemblyReferenceDirectory + "net40" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyEmbeddedResourcesDirectory = EasyPeasyDataDirectory + "EmbeddedResources" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyReferenceSourceLibraries = EasyPeasyDataDirectory + "ReferenceSourceLibraries" + Path.DirectorySeparatorChar;
+        public static string EasyPeasySharpSploitDirectory = EasyPeasyReferenceSourceLibraries + "SharpSploit" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyRubeusDirectory = EasyPeasyReferenceSourceLibraries + "Rubeus" + Path.DirectorySeparatorChar;
 
-        public static string CovenantTaskDirectory = CovenantDataDirectory + "Tasks" + Path.DirectorySeparatorChar;
-        public static string CovenantTaskCSharpDirectory = CovenantTaskDirectory + "CSharp" + Path.DirectorySeparatorChar;
-        public static string CovenantTaskCSharpNetCoreApp30Directory = CovenantTaskCSharpDirectory + "netcoreapp3.0" + Path.DirectorySeparatorChar;
-        public static string CovenantTaskCSharpCompiledDirectory = CovenantTaskCSharpDirectory + "Compiled" + Path.DirectorySeparatorChar;
-        public static string CovenantTaskCSharpCompiledNet35Directory = CovenantTaskCSharpCompiledDirectory + "net35" + Path.DirectorySeparatorChar;
-        public static string CovenantTaskCSharpCompiledNet40Directory = CovenantTaskCSharpCompiledDirectory + "net40" + Path.DirectorySeparatorChar;
-        public static string CovenantTaskCSharpCompiledNetCoreApp30Directory = CovenantTaskCSharpCompiledDirectory + "netcoreapp3.0" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyTaskDirectory = EasyPeasyDataDirectory + "Tasks" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyTaskCSharpDirectory = EasyPeasyTaskDirectory + "CSharp" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyTaskCSharpNetCoreApp30Directory = EasyPeasyTaskCSharpDirectory + "netcoreapp3.0" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyTaskCSharpCompiledDirectory = EasyPeasyTaskCSharpDirectory + "Compiled" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyTaskCSharpCompiledNet35Directory = EasyPeasyTaskCSharpCompiledDirectory + "net35" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyTaskCSharpCompiledNet40Directory = EasyPeasyTaskCSharpCompiledDirectory + "net40" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyTaskCSharpCompiledNetCoreApp30Directory = EasyPeasyTaskCSharpCompiledDirectory + "netcoreapp3.0" + Path.DirectorySeparatorChar;
 
-        public static string CovenantLogDirectory = CovenantDataDirectory + "Logs" + Path.DirectorySeparatorChar;
-        public static string CovenantLogFile = CovenantLogDirectory + "covenant.log";
-        public static string CovenantPrivateCertFile = CovenantDataDirectory + "covenant-dev-private.pfx";
-        public static string CovenantPublicCertFile = CovenantDataDirectory + "covenant-dev-public.cer";
-        public static string CovenantListenersDirectory = CovenantDataDirectory + "Listeners" + Path.DirectorySeparatorChar;
-        public static string CovenantLauncherDirectory = CovenantDataDirectory + "Launchers" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyLogDirectory = EasyPeasyDataDirectory + "Logs" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyLogFile = EasyPeasyLogDirectory + "covenant.log";
+        public static string EasyPeasyPrivateCertFile = EasyPeasyDataDirectory + "covenant-dev-private.pfx";
+        public static string EasyPeasyPublicCertFile = EasyPeasyDataDirectory + "covenant-dev-public.cer";
+        public static string EasyPeasyListenersDirectory = EasyPeasyDataDirectory + "Listeners" + Path.DirectorySeparatorChar;
+        public static string EasyPeasyLauncherDirectory = EasyPeasyDataDirectory + "Launchers" + Path.DirectorySeparatorChar;
 
-        public static string CovenantAppSettingsFile = CovenantDataDirectory + "appsettings.json";
-        public static string CovenantJwtKeyReplaceMessage = "[KEY USED TO SIGN/VERIFY JWT TOKENS, ALWAYS REPLACE THIS VALUE]";
+        public static string EasyPeasyAppSettingsFile = EasyPeasyDataDirectory + "appsettings.json";
+        public static string EasyPeasyJwtKeyReplaceMessage = "[KEY USED TO SIGN/VERIFY JWT TOKENS, ALWAYS REPLACE THIS VALUE]";
 
         public static List<Compiler.Reference> DefaultNet35References = new List<Compiler.Reference>
         {
-            new Compiler.Reference { File = CovenantAssemblyReferenceNet35Directory + "mscorlib.dll", Framework = DotNetVersion.Net35, Enabled = true },
-            new Compiler.Reference { File = CovenantAssemblyReferenceNet35Directory + "System.dll", Framework = DotNetVersion.Net35, Enabled = true },
-            new Compiler.Reference { File = CovenantAssemblyReferenceNet35Directory + "System.Core.dll", Framework = DotNetVersion.Net35, Enabled = true },
+            new Compiler.Reference { File = EasyPeasyAssemblyReferenceNet35Directory + "mscorlib.dll", Framework = DotNetVersion.Net35, Enabled = true },
+            new Compiler.Reference { File = EasyPeasyAssemblyReferenceNet35Directory + "System.dll", Framework = DotNetVersion.Net35, Enabled = true },
+            new Compiler.Reference { File = EasyPeasyAssemblyReferenceNet35Directory + "System.Core.dll", Framework = DotNetVersion.Net35, Enabled = true },
         };
 
         public static List<Compiler.Reference> DefaultNet40References = new List<Compiler.Reference>
         {
-            new Compiler.Reference { File = CovenantAssemblyReferenceNet40Directory + "mscorlib.dll", Framework = DotNetVersion.Net40, Enabled = true },
-            new Compiler.Reference { File = CovenantAssemblyReferenceNet40Directory + "System.dll", Framework = DotNetVersion.Net40, Enabled = true },
-            new Compiler.Reference { File = CovenantAssemblyReferenceNet40Directory + "System.Core.dll", Framework = DotNetVersion.Net40, Enabled = true }
+            new Compiler.Reference { File = EasyPeasyAssemblyReferenceNet40Directory + "mscorlib.dll", Framework = DotNetVersion.Net40, Enabled = true },
+            new Compiler.Reference { File = EasyPeasyAssemblyReferenceNet40Directory + "System.dll", Framework = DotNetVersion.Net40, Enabled = true },
+            new Compiler.Reference { File = EasyPeasyAssemblyReferenceNet40Directory + "System.Core.dll", Framework = DotNetVersion.Net40, Enabled = true }
         };
 
         public static List<Compiler.Reference> DefaultNetFrameworkReferences = new List<Compiler.Reference>
         {
-            new Compiler.Reference { File = CovenantAssemblyReferenceNet35Directory + "mscorlib.dll", Framework = DotNetVersion.Net35, Enabled = true },
-            new Compiler.Reference { File = CovenantAssemblyReferenceNet40Directory + "mscorlib.dll", Framework = DotNetVersion.Net40, Enabled = true },
-            new Compiler.Reference { File = CovenantAssemblyReferenceNet35Directory + "System.dll", Framework = DotNetVersion.Net35, Enabled = true },
-            new Compiler.Reference { File = CovenantAssemblyReferenceNet40Directory + "System.dll", Framework = DotNetVersion.Net40, Enabled = true },
-            new Compiler.Reference { File = CovenantAssemblyReferenceNet35Directory + "System.Core.dll", Framework = DotNetVersion.Net35, Enabled = true },
-            new Compiler.Reference { File = CovenantAssemblyReferenceNet40Directory + "System.Core.dll", Framework = DotNetVersion.Net40, Enabled = true }
+            new Compiler.Reference { File = EasyPeasyAssemblyReferenceNet35Directory + "mscorlib.dll", Framework = DotNetVersion.Net35, Enabled = true },
+            new Compiler.Reference { File = EasyPeasyAssemblyReferenceNet40Directory + "mscorlib.dll", Framework = DotNetVersion.Net40, Enabled = true },
+            new Compiler.Reference { File = EasyPeasyAssemblyReferenceNet35Directory + "System.dll", Framework = DotNetVersion.Net35, Enabled = true },
+            new Compiler.Reference { File = EasyPeasyAssemblyReferenceNet40Directory + "System.dll", Framework = DotNetVersion.Net40, Enabled = true },
+            new Compiler.Reference { File = EasyPeasyAssemblyReferenceNet35Directory + "System.Core.dll", Framework = DotNetVersion.Net35, Enabled = true },
+            new Compiler.Reference { File = EasyPeasyAssemblyReferenceNet40Directory + "System.Core.dll", Framework = DotNetVersion.Net40, Enabled = true }
         };
 
         public static List<Compiler.Reference> DefaultReferencesNetCore { get; set; } = new List<Compiler.Reference>

@@ -3,9 +3,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-using Covenant.Core;
+using EasyPeasy.Core;
 
-namespace Covenant.Models
+namespace EasyPeasy.Models
 {
     public interface IYamlSerializable<T>
     {

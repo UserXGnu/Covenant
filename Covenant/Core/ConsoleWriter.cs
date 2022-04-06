@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Covenant.Core
+namespace EasyPeasy.Core
 {
     public static class ConsoleWriter
     {

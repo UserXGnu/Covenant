@@ -1,5 +1,5 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System;
@@ -10,18 +10,18 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-using Covenant.Core;
-using Covenant.Models;
-using Covenant.Models.Grunts;
+using EasyPeasy.Core;
+using EasyPeasy.Models;
+using EasyPeasy.Models.Grawls;
 
-namespace Covenant.Controllers.ApiControllers
+namespace EasyPeasy.Controllers.ApiControllers
 {
     [ApiController, Route("api/embeddedresources"), Authorize(Policy = "RequireJwtBearer")]
     public class EmbeddedResourceApiController : Controller
     {
-        private readonly ICovenantService _service;
+        private readonly IEasyPeasyService _service;
 
-        public EmbeddedResourceApiController(ICovenantService service)
+        public EmbeddedResourceApiController(IEasyPeasyService service)
         {
             _service = service;
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Covenant.Models.Indicators
+namespace EasyPeasy.Models.Indicators
 {
     public enum IndicatorType
     {

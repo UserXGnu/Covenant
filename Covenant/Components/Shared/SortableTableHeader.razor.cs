@@ -1,6 +1,6 @@
-﻿using Covenant.Models;
+﻿using EasyPeasy.Models;
 
-namespace Covenant.Components.Shared
+namespace EasyPeasy.Components.Shared
 {
     partial class SortableTableHeader<TItem, TItem2>
     {

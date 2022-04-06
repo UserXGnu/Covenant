@@ -1,10 +1,10 @@
 ﻿@page "/template/edit/{ImplantTemplateId:int}"
 @attribute [Authorize(Roles = "User, Administrator")]
-@inherits OwningComponentBase<ICovenantService>
+@inherits OwningComponentBase<IEasyPeasyService>
 
 @using Microsoft.JSInterop
-@using Covenant.Core
-@using Covenant.Models.Grunts
+@using EasyPeasy.Core
+@using EasyPeasy.Models.Grawls
 @inject IJSRuntime IJSRuntime
 @inject NavigationManager NavigationManager
 

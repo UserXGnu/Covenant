@@ -1,0 +1,124 @@
+﻿@page "/covenantuser/edit/{EasyPeasyUserId}"
+@attribute [Authorize(Roles = "User, Administrator")]
+@inherits OwningComponentBase<IEasyPeasyService>
+
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Authorization
+@using EasyPeasy.Core
+@using EasyPeasy.Models.EasyPeasy
+@inject UserManager<EasyPeasyUser> UserManager
+@inject NavigationManager NavigationManager
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3">
+    <h1 class="h2">User: <span id="user-name" class="primary-color">@EasyPeasyUser.UserName</span></h1>
+</div>
+
+<div class="row">
+    <div class="col-md-4 border-right">
+        <EasyPeasyUserRegisterForm EasyPeasyUserRegister="@(new EasyPeasyUserRegister { UserName = EasyPeasyUser.UserName })" OnSubmit="OnEditPassword" Disabled="this.CurrentUser.Id != this.EasyPeasyUser.Id" readonly>
+            <span class="fe fe-edit"></span> Edit Password
+        </EasyPeasyUserRegisterForm>
+    </div>
+    <div class="col-md-4">
+        <EditForm Model="EasyPeasyUser" OnSubmit="OnChangeTheme">
+            <div class="form-group">
+                <label for="ThemeId">Theme</label>
+                <select id="ThemeId" name="ThemeId" @bind="EasyPeasyUser.ThemeId" class="form-control">
+                    @foreach (Theme Theme in Themes)
+                    {
+                        <option value="@Theme.Id">@Theme.Name</option>
+                    }
+                </select>
+                <div class="text-danger"><ValidationMessage For="() => EasyPeasyUser.ThemeId" /></div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <span class="fe fe-edit"></span> Edit Theme
+            </button>
+        </EditForm>
+    </div>
+    <div class="col-md-4">
+        <EditEasyPeasyUserRolesForm EasyPeasyUser="EasyPeasyUser" OnChangeRoles="OnEditRoles" />
+    </div>
+</div>
+
+<button type="button" class="btn btn-danger mt-2" @onclick="(e => OnDeleteUser(EasyPeasyUser))">
+    <span class="fe fe-x"></span> Delete
+</button>
+
+@code {
+    [Parameter]
+    public string EasyPeasyUserId { get; set; }
+
+    [Parameter]
+    public EasyPeasyUser EasyPeasyUser { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; }
+    private EasyPeasyUser CurrentUser { get; set; }
+
+    private IEnumerable<Theme> Themes { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.EasyPeasyUser = this.EasyPeasyUser ?? await Service.GetUser(this.EasyPeasyUserId);
+        this.CurrentUser = this.CurrentUser ?? await Service.GetCurrentUser((await AuthenticationState).User);
+        this.Themes = await Service.GetThemes();
+        Service.DisposeContext();
+    }
+
+    private async Task OnEditRoles(IEnumerable<IdentityRole> roles)
+    {
+        try
+        {
+            IEnumerable<IdentityRole> currentRoles = (await Service.GetUserRolesForUser(this.EasyPeasyUser.Id)).Select(UR =>
+            {
+                return Service.GetRole(UR.RoleId).WaitResult();
+            });
+
+            IEnumerable<IdentityRole> rolesToAdd = roles.Where(R => !currentRoles.Select(CR => CR.Id).Contains(R.Id));
+            IEnumerable<IdentityRole> rolesToRemove = currentRoles.Where(CR => !roles.Select(R => R.Id).Contains(CR.Id));
+            Service.DisposeContext();
+            foreach (IdentityRole role in rolesToAdd)
+            {
+                await Service.CreateUserRole(this.EasyPeasyUser.Id, role.Id);
+            }
+            Service.DisposeContext();
+            foreach (IdentityRole role in rolesToRemove)
+            {
+                await Service.DeleteUserRole(this.EasyPeasyUser.Id, role.Id);
+            }
+            NavigationManager.NavigateTo("/covenantuser");
+        }
+        catch (Exception e) when (e is ControllerNotFoundException || e is ControllerBadRequestException || e is ControllerUnauthorizedException)
+        {
+            // return RedirectToAction(nameof(Index));
+        }
+    }
+
+    private async Task OnEditPassword(EasyPeasyUserRegister register)
+    {
+        await Service.EditUserPassword(this.CurrentUser, register);
+        NavigationManager.NavigateTo("/covenantuser");
+    }
+
+    private async Task OnDeleteUser(EasyPeasyUser user)
+    {
+        try
+        {
+            await Service.DeleteUser(user.Id);
+            NavigationManager.NavigateTo("/covenantuser");
+        }
+        catch (Exception e) when (e is ControllerNotFoundException || e is ControllerBadRequestException || e is ControllerUnauthorizedException)
+        {
+            // ModelState.AddModelError(string.Empty, e.Message);
+            // return RedirectToAction(nameof(Index));
+        }
+    }
+
+    private async Task OnChangeTheme()
+    {
+        await Service.EditUser(this.EasyPeasyUser);
+        Service.DisposeContext();
+    }
+}

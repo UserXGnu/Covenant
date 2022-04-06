@@ -1,5 +1,5 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System.Threading.Tasks;
@@ -8,17 +8,17 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-using Covenant.Core;
-using Covenant.Models.Covenant;
+using EasyPeasy.Core;
+using EasyPeasy.Models.EasyPeasy;
 
-namespace Covenant.Controllers
+namespace EasyPeasy.Controllers
 {
     [ApiController, Route("api/events"), Authorize(Policy = "RequireJwtBearer")]
     public class EventApiController : Controller
     {
-        private readonly ICovenantService _service;
+        private readonly IEasyPeasyService _service;
 
-        public EventApiController(ICovenantService service)
+        public EventApiController(IEasyPeasyService service)
         {
             _service = service;
         }
@@ -56,7 +56,7 @@ namespace Covenant.Controllers
 
         // GET: api/events/time
         // <summary>
-        // Get Covenant's current DateTime
+        // Get EasyPeasy's current DateTime
         // </summary>
         [HttpGet("time", Name = "GetEventTime")]
         public async Task<ActionResult<long>> GetEventTime()

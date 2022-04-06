@@ -1,13 +1,17 @@
 ﻿@page "/launcher/create/{LauncherId:int}"
-@attribute [Authorize(Roles = "User, Administrator")]
-@inherits OwningComponentBase<ICovenantService>
+@attribute [Authorize(Roles = "Administrator")]
+@inherits OwningComponentBase<IEasyPeasyService>
 @implements IDisposable
 
-@using Covenant.Core
-@using Covenant.Models.Covenant
-@using Covenant.Models.Listeners
-@using Covenant.Models.Launchers
 
+
+@using EasyPeasy.Core
+@using EasyPeasy.Models.EasyPeasy
+@using EasyPeasy.Models.Listeners
+@using EasyPeasy.Models.Launchers
+
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.JSInterop
 @inject IJSRuntime IJSRuntime
 @inject INotificationService INotificationService
@@ -98,6 +102,14 @@
     [CascadingParameter]
     public Theme Theme { get; set; }
 
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; }
+
+    private EasyPeasyUser CurrentUser { get; set; }
+    private IdentityRole AdministratorRole { get; set; }
+    private bool UserIsAdmin { get; set; }
+
+
     private const int MAX_LAUNCHER_LENGTH = 30000;
 
     private string PowerShellEncodedLauncherString
@@ -127,6 +139,10 @@
 
     protected override async Task OnInitializedAsync()
     {
+        AdministratorRole = await Service.GetRoleByName("Administrator");
+        CurrentUser = await Service.GetCurrentUser((await AuthenticationState).User);
+        UserIsAdmin = UserInRole (CurrentUser, AdministratorRole.Id);
+
         this.Launcher = this.Launcher ?? await Service.GetLauncher(this.LauncherId);
         this.INotificationService.OnEditLauncher += OnEditLauncher;
     }
@@ -161,6 +177,9 @@
 
     private async Task OnGenerate(Launcher aLauncher)
     {
+        if (!UserIsAdmin) {
+           return;
+        }
         try
         {
             switch (aLauncher.Name)
@@ -169,6 +188,11 @@
                     BinaryLauncher binaryLauncher = (BinaryLauncher)aLauncher;
                     binaryLauncher = await Service.EditBinaryLauncher(binaryLauncher);
                     Launcher = await Service.GenerateBinaryLauncher();
+                    break;
+                case "ServiceBinary":
+                    ServiceBinaryLauncher serviceBinaryLauncher = (ServiceBinaryLauncher)aLauncher;
+                    serviceBinaryLauncher = await Service.EditServiceBinaryLauncher(serviceBinaryLauncher);
+                    Launcher = await Service.GenerateServiceBinaryLauncher();
                     break;
                 case "ShellCode":
                     ShellCodeLauncher shellcodeLauncher = (ShellCodeLauncher)aLauncher;
@@ -226,6 +250,7 @@
 
     private async Task OnHost(string Path)
     {
+        if (!UserIsAdmin) { return; }
         try
         {
             HostedFile file = new HostedFile
@@ -241,6 +266,12 @@
                     binaryLauncher = await Service.GenerateBinaryLauncher();
                     file = await Service.CreateHostedFile(file);
                     Launcher = await Service.GenerateBinaryHostedLauncher(file);
+                    break;
+                case "ServiceBinary":
+                    ServiceBinaryLauncher serviceBinaryLauncher = (ServiceBinaryLauncher)Launcher;
+                    serviceBinaryLauncher = await Service.GenerateServiceBinaryLauncher();
+                    file = await Service.CreateHostedFile(file);
+                    Launcher = await Service.GenerateServiceBinaryHostedLauncher(file);
                     break;
                 case "ShellCode":
                     ShellCodeLauncher shellcodeLauncher = (ShellCodeLauncher)Launcher;
@@ -315,9 +346,9 @@
         else if (Launcher.Name == "PowerShell")
         {
             string code = ((PowerShellLauncher)Launcher).PowerShellCode;
-            content = string.IsNullOrEmpty(code) ? "" : Convert.ToBase64String(Common.CovenantEncoding.GetBytes(code));
+            content = string.IsNullOrEmpty(code) ? "" : Convert.ToBase64String(Common.EasyPeasyEncoding.GetBytes(code));
         }
-        else if (Launcher.Name == "InstallUtil")
+        else if (Launcher.Name == "InstallUtil" || Launcher.Name == "ServiceBinary")
         {
             string code = ((DiskLauncher)Launcher).DiskCode;
             content = code == null ? "" : code;
@@ -325,8 +356,20 @@
         else if (new List<string> { "Cscript", "InstallUtil", "MSBuild", "Mshta", "Regsvr32", "Wmic", "Wscript" }.Contains(Launcher.Name))
         {
             string code = ((DiskLauncher)Launcher).DiskCode;
-            content = string.IsNullOrEmpty(code) ? "" : Convert.ToBase64String(Common.CovenantEncoding.GetBytes(code));
+            content = string.IsNullOrEmpty(code) ? "" : Convert.ToBase64String(Common.EasyPeasyEncoding.GetBytes(code));
         }
         return content == null ? "" : content;
+    }
+    private bool UserInRole(EasyPeasyUser user, string role)
+    {
+        try
+        {
+            Service.GetUserRole(user.Id, role).WaitTask();
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 }

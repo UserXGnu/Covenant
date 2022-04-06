@@ -1,9 +1,9 @@
 ﻿@using Microsoft.JSInterop
-@using Covenant.Models.Indicators
-@using Covenant.Components.Shared
+@using EasyPeasy.Models.Indicators
+@using EasyPeasy.Components.Shared
 @inject IJSRuntime IJSRuntime
 
-<CovenantTable TItem="NetworkIndicator" Items="NetworkIndicators.ToList()" SearchRow="IsRowDisplayed"
+<EasyPeasyTable TItem="NetworkIndicator" Items="NetworkIndicators.ToList()" SearchRow="IsRowDisplayed"
                IsSearchable="IsSearchable" IsSortable="IsSortable" IsPaginated="IsPaginated" PageLength="PageLength" class="table table-hover">
     <TableHeader>
         <SortableTableHeader TItem="NetworkIndicator" TItem2="string" GetSortableProperty="(indicator) => indicator.Protocol">
@@ -31,7 +31,7 @@
             <td>@indicator.URI</td>
         </tr>
     </TableRow>
-</CovenantTable>
+</EasyPeasyTable>
 
 @code {
     [Parameter]

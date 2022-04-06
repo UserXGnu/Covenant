@@ -1,5 +1,5 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System;
@@ -24,12 +24,12 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-using Covenant.Hubs;
-using Covenant.Core;
-using Covenant.Models;
-using Covenant.Models.Covenant;
+using EasyPeasy.Hubs;
+using EasyPeasy.Core;
+using EasyPeasy.Models;
+using EasyPeasy.Models.EasyPeasy;
 
-namespace Covenant
+namespace EasyPeasy
 {
     public class Startup
     {
@@ -43,13 +43,13 @@ namespace Covenant
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<CovenantContext>(options =>
+            services.AddDbContext<EasyPeasyContext>(options =>
             {
                 options.EnableSensitiveDataLogging(true);
             }, ServiceLifetime.Transient);
 
-            services.AddIdentity<CovenantUser, IdentityRole>()
-                .AddEntityFrameworkStores<CovenantContext>()
+            services.AddIdentity<EasyPeasyUser, IdentityRole>()
+                .AddEntityFrameworkStores<EasyPeasyContext>()
                 .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(options =>
@@ -76,8 +76,8 @@ namespace Covenant
                 options.Cookie.HttpOnly = true;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(120);
 
-                options.LoginPath = "/CovenantUser/Login";
-                options.LogoutPath = "/CovenantUser/Logout";
+                options.LoginPath = "/EasyPeasyUser/Login";
+                options.LogoutPath = "/EasyPeasyUser/Logout";
                 options.AccessDeniedPath = "/Login/AccessDenied";
                 options.SlidingExpiration = true;
             });
@@ -92,7 +92,7 @@ namespace Covenant
                     {
                         ValidIssuer = Configuration["JwtIssuer"],
                         ValidAudience = Configuration["JwtAudience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Common.CovenantEncoding.GetBytes(Configuration["JwtKey"])),
+                        IssuerSigningKey = new SymmetricSecurityKey(Common.EasyPeasyEncoding.GetBytes(Configuration["JwtKey"])),
                         ClockSkew = TimeSpan.Zero
                     };
                     options.Events = new JwtBearerEvents
@@ -154,7 +154,7 @@ namespace Covenant
                     return desc.RelativePath.StartsWith("api", StringComparison.CurrentCultureIgnoreCase);
                 });
 
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Covenant API", Version = "v0.1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "EasyPeasy API", Version = "v0.1" });
                 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
@@ -191,11 +191,11 @@ namespace Covenant
 
             services.AddSingleton<ConcurrentDictionary<int, CancellationTokenSource>>();
             services.AddSingleton<INotificationService, NotificationService>();
-            services.AddSingleton<CovenantAPIService, CovenantAPIService>();
-            services.AddTransient<ICovenantService, CovenantService>();
-            // services.AddTransient<IRemoteCovenantService, CovenantHubService>();
-            // services.AddTransient<CovenantBlazorService>();
-            // services.AddSingleton<SignalRCovenantService>();
+            services.AddSingleton<EasyPeasyAPIService, EasyPeasyAPIService>();
+            services.AddTransient<IEasyPeasyService, EasyPeasyService>();
+            // services.AddTransient<IRemoteEasyPeasyService, EasyPeasyHubService>();
+            // services.AddTransient<EasyPeasyBlazorService>();
+            // services.AddSingleton<SignalREasyPeasyService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -210,7 +210,7 @@ namespace Covenant
                 });
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Covenant API V0.1");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "EasyPeasy API V0.1");
                 });
                 app.Use((context, next) =>
                 {
@@ -233,9 +233,9 @@ namespace Covenant
                 endpoints.MapBlazorHub();
                 // endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                endpoints.MapHub<GruntHub>("/grunthub");
+                endpoints.MapHub<GrawlHub>("/grawlhub");
                 endpoints.MapHub<EventHub>("/eventhub");
-                endpoints.MapHub<CovenantHub>("/covenanthub");
+                endpoints.MapHub<EasyPeasyHub>("/covenanthub");
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

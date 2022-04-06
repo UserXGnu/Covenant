@@ -1,5 +1,5 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System.Linq;
@@ -9,18 +9,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-using Covenant.Core;
-using Covenant.Models;
-using Covenant.Models.Covenant;
+using EasyPeasy.Core;
+using EasyPeasy.Models;
+using EasyPeasy.Models.EasyPeasy;
 
-namespace Covenant.Controllers
+namespace EasyPeasy.Controllers
 {
     [ApiController, Route("api/credentials"), Authorize(Policy = "RequireJwtBearer")]
     public class CredentialApiController : Controller
     {
-        private readonly ICovenantService _service;
+        private readonly IEasyPeasyService _service;
 
-        public CredentialApiController(ICovenantService service)
+        public CredentialApiController(IEasyPeasyService service)
         {
             _service = service;
         }

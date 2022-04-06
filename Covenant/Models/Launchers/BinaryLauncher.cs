@@ -1,28 +1,28 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-using Covenant.Models.Listeners;
-using Covenant.Models.Grunts;
+using EasyPeasy.Models.Listeners;
+using EasyPeasy.Models.Grawls;
 
-namespace Covenant.Models.Launchers
+namespace EasyPeasy.Models.Launchers
 {
     public class BinaryLauncher : Launcher
     {
         public BinaryLauncher()
         {
             this.Type = LauncherType.Binary;
-            this.Description = "Uses a generated .NET Framework binary to launch a Grunt.";
+            this.Description = "Uses a generated .NET Framework binary to launch a Grawl.";
             this.Name = "Binary";
             this.OutputKind = OutputKind.ConsoleApplication;
             this.CompressStager = false;
         }
 
-        public override string GetLauncher(string StagerCode, byte[] StagerAssembly, Grunt grunt, ImplantTemplate template)
+        public override string GetLauncher(string StagerCode, byte[] StagerAssembly, Grawl grawl, ImplantTemplate template)
         {
             this.StagerCode = StagerCode;
             this.Base64ILByteString = Convert.ToBase64String(StagerAssembly);

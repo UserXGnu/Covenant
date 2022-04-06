@@ -1,5 +1,5 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System;
@@ -17,22 +17,22 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Covenant.Core
+namespace EasyPeasy.Core
 {
     public static class Utilities
     {
         public static byte[] Compress(byte[] bytes)
         {
-            byte[] compressedBytes;
-            using (MemoryStream memoryStream = new MemoryStream())
+            byte[] packedbytes;
+            using (MemoryStream memOrYstream = new MemoryStream())
             {
-                using (DeflateStream deflateStream = new DeflateStream(memoryStream, CompressionMode.Compress))
+                using (DeflateStream deFlatEstream = new DeflateStream(memOrYstream, CompressionMode.Compress))
                 {
-                    deflateStream.Write(bytes, 0, bytes.Length);
+                    deFlatEstream.Write(bytes, 0, bytes.Length);
                 }
-                compressedBytes = memoryStream.ToArray();
+                packedbytes = memOrYstream.ToArray();
             }
-            return compressedBytes;
+            return packedbytes;
         }
 
 		public static string GenerateJwtToken(string UserName, string UserId, string[] Roles,
@@ -49,7 +49,7 @@ namespace Covenant.Core
 				claims.Add(new Claim(ClaimTypes.Role, role));
 			}
 
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Common.CovenantEncoding.GetBytes(JwtKey));
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Common.EasyPeasyEncoding.GetBytes(JwtKey));
             SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             DateTime expireTime = DateTime.Now.AddDays(Convert.ToDouble(JwtExpireDays));
 
@@ -137,11 +137,11 @@ namespace Covenant.Core
             return filename;
         }
 
-        public static string GetExtensionForLanguage(Models.Grunts.ImplantLanguage language)
+        public static string GetExtensionForLanguage(Models.Grawls.ImplantLanguage language)
         {
             switch (language)
             {
-                case Models.Grunts.ImplantLanguage.CSharp:
+                case Models.Grawls.ImplantLanguage.CSharp:
                     return ".cs";
                 default:
                     return ".cs";

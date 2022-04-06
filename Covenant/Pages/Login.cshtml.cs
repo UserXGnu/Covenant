@@ -4,18 +4,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Covenant.Core;
-using Covenant.Models;
-using Covenant.Models.Covenant;
+using EasyPeasy.Core;
+using EasyPeasy.Models;
+using EasyPeasy.Models.EasyPeasy;
 
-namespace Covenant.Pages
+namespace EasyPeasy.Pages
 {
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<CovenantUser> _signInManager;
-        private readonly UserManager<CovenantUser> _userManager;
+        private readonly SignInManager<EasyPeasyUser> _signInManager;
+        private readonly UserManager<EasyPeasyUser> _userManager;
 
-        public LoginModel(SignInManager<CovenantUser> signInManager, UserManager<CovenantUser> userManager)
+        public LoginModel(SignInManager<EasyPeasyUser> signInManager, UserManager<EasyPeasyUser> userManager)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -27,7 +27,7 @@ namespace Covenant.Pages
         }
 
         [BindProperty]
-        public CovenantUserRegister CovenantUserRegister { get; set; }
+        public EasyPeasyUserRegister EasyPeasyUserRegister { get; set; }
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -39,22 +39,22 @@ namespace Covenant.Pages
             {
                 if (!_userManager.Users.ToList().Where(U => _userManager.IsInRoleAsync(U, "Administrator").WaitResult()).Any())
                 {
-                    if (CovenantUserRegister.Password != CovenantUserRegister.ConfirmPassword)
+                    if (EasyPeasyUserRegister.Password != EasyPeasyUserRegister.ConfirmPassword)
                     {
                         return BadRequest($"BadRequest - Password does not match ConfirmPassword.");
                     }
 
-                    CovenantUser user = new CovenantUser { UserName = CovenantUserRegister.UserName };
-                    IdentityResult userResult = await _userManager.CreateAsync(user, CovenantUserRegister.Password);
+                    EasyPeasyUser user = new EasyPeasyUser { UserName = EasyPeasyUserRegister.UserName };
+                    IdentityResult userResult = await _userManager.CreateAsync(user, EasyPeasyUserRegister.Password);
                     await _userManager.AddToRoleAsync(user, "User");
                     await _userManager.AddToRoleAsync(user, "Administrator");
-                    await _signInManager.PasswordSignInAsync(CovenantUserRegister.UserName, CovenantUserRegister.Password, true, lockoutOnFailure: false);
+                    await _signInManager.PasswordSignInAsync(EasyPeasyUserRegister.UserName, EasyPeasyUserRegister.Password, true, lockoutOnFailure: false);
                     // return RedirectToAction(nameof(Index));
                     return LocalRedirect("/home/index");
                 }
                 else
                 {
-                    var result = await _signInManager.PasswordSignInAsync(CovenantUserRegister.UserName, CovenantUserRegister.Password, true, lockoutOnFailure: false);
+                    var result = await _signInManager.PasswordSignInAsync(EasyPeasyUserRegister.UserName, EasyPeasyUserRegister.Password, true, lockoutOnFailure: false);
                     if (!result.Succeeded == true)
                     {
                         ModelState.AddModelError(string.Empty, "Incorrect username or password");

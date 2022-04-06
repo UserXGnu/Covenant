@@ -159,8 +159,8 @@ window.ModalCommand = (selector, command) => {
     $(selector).modal(command);
 }
 
-window.InitializeGruntDataTable = () => {
-    $('#grunt-table').DataTable({
+window.InitializeGrawlDataTable = () => {
+    $('#grawl-table').DataTable({
         "pageLength": 5,
         "lengthChange": false,
         "searching": false,
@@ -271,7 +271,7 @@ window.nodes = [];
 window.links = [];
 window.lastNodeId = 0;
 
-window.GraphDisplayGrunt = (id, name) => {
+window.GraphDisplayGrawl = (id, name) => {
     const node = { id: id, name: name, reflexive: false, x: 50, y: 50, color: "#007BFF" };
     window.nodes.push(node);
     window.GraphRestart();
@@ -283,7 +283,7 @@ window.GraphDisplayListener = (id, name) => {
     window.GraphRestart();
 }
 
-window.GraphDisplayGruntLink = (idFrom, idTo) => {
+window.GraphDisplayGrawlLink = (idFrom, idTo) => {
     const fromNode = window.nodes.filter(
         function (node) { return node.id == idFrom }
     )[0];
@@ -296,14 +296,14 @@ window.GraphDisplayGruntLink = (idFrom, idTo) => {
     window.GraphRestart();
 }
 
-window.GraphDisplayGruntListenerLink = (listenerId, gruntId) => {
+window.GraphDisplayGrawlListenerLink = (listenerId, grawlId) => {
     const listenerNode = window.nodes.filter(
         function (node) { return node.id == listenerId }
     )[0];
-    const gruntNode = window.nodes.filter(
-        function (node) { return node.id == gruntId }
+    const grawlNode = window.nodes.filter(
+        function (node) { return node.id == grawlId }
     )[0];
-    const link = { source: listenerNode, target: gruntNode, left: true, right: false, color: "#999999" };
+    const link = { source: listenerNode, target: grawlNode, left: true, right: false, color: "#999999" };
     window.links.push(link);
     window.GraphRestart();
 }

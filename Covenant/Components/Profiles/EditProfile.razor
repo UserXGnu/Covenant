@@ -1,14 +1,14 @@
 ﻿@page "/profile/edit/{ProfileId:int}"
 @attribute [Authorize(Roles = "Administrator")]
-@inherits OwningComponentBase<ICovenantService>
+@inherits OwningComponentBase<IEasyPeasyService>
 
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Components.Authorization
-@using Covenant.Core
-@using Covenant.Models.Covenant
-@using Covenant.Models.Listeners
-@inject UserManager<CovenantUser> UserManager
+@using EasyPeasy.Core
+@using EasyPeasy.Models.EasyPeasy
+@using EasyPeasy.Models.Listeners
+@inject UserManager<EasyPeasyUser> UserManager
 @inject IJSRuntime IJSRuntime
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager

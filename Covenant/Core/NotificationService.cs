@@ -5,23 +5,23 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 
-using Covenant.Hubs;
-using Covenant.Models.Covenant;
-using Covenant.Models.Listeners;
-using Covenant.Models.Launchers;
-using Covenant.Models.Grunts;
-using Covenant.Models.Indicators;
+using EasyPeasy.Hubs;
+using EasyPeasy.Models.EasyPeasy;
+using EasyPeasy.Models.Listeners;
+using EasyPeasy.Models.Launchers;
+using EasyPeasy.Models.Grawls;
+using EasyPeasy.Models.Indicators;
 
-namespace Covenant.Core
+namespace EasyPeasy.Core
 {
-    public interface ICovenantUserNotificationService
+    public interface IEasyPeasyUserNotificationService
     {
-        event EventHandler<CovenantUser> OnCreateCovenantUser;
-        event EventHandler<CovenantUser> OnEditCovenantUser;
-        event EventHandler<string> OnDeleteCovenantUser;
-        Task NotifyCreateCovenantUser(object sender, CovenantUser user);
-        Task NotifyEditCovenantUser(object sender, CovenantUser user);
-        Task NotifyDeleteCovenantUser(object sender, string id);
+        event EventHandler<EasyPeasyUser> OnCreateEasyPeasyUser;
+        event EventHandler<EasyPeasyUser> OnEditEasyPeasyUser;
+        event EventHandler<string> OnDeleteEasyPeasyUser;
+        Task NotifyCreateEasyPeasyUser(object sender, EasyPeasyUser user);
+        Task NotifyEditEasyPeasyUser(object sender, EasyPeasyUser user);
+        Task NotifyDeleteEasyPeasyUser(object sender, string id);
     }
 
     public interface IIdentityRoleNotificationService
@@ -63,13 +63,13 @@ namespace Covenant.Core
         event EventHandler<int> OnDeleteImplantTemplate;
     }
 
-    public interface IGruntNotificationService
+    public interface IGrawlNotificationService
     {
-        event EventHandler<Grunt> OnCreateGrunt;
-        event EventHandler<Grunt> OnEditGrunt;
-        event EventHandler<int> OnDeleteGrunt;
-        Task NotifyCreateGrunt(object sender, Grunt grunt);
-        Task NotifyEditGrunt(object sender, Grunt grunt);
+        event EventHandler<Grawl> OnCreateGrawl;
+        event EventHandler<Grawl> OnEditGrawl;
+        event EventHandler<int> OnDeleteGrawl;
+        Task NotifyCreateGrawl(object sender, Grawl grawl);
+        Task NotifyEditGrawl(object sender, Grawl grawl);
     }
 
     public interface IReferenceAssemblyNotificationService
@@ -93,28 +93,28 @@ namespace Covenant.Core
         event EventHandler<int> OnDeleteReferenceSourceLibrary;
     }
 
-    public interface IGruntTaskOptionNotificationService
+    public interface IGrawlTaskOptionNotificationService
     {
-        event EventHandler<GruntTaskOption> OnCreateGruntTaskOption;
-        event EventHandler<GruntTaskOption> OnEditGruntTaskOption;
-        event EventHandler<int> OnDeleteGruntTaskOption;
+        event EventHandler<GrawlTaskOption> OnCreateGrawlTaskOption;
+        event EventHandler<GrawlTaskOption> OnEditGrawlTaskOption;
+        event EventHandler<int> OnDeleteGrawlTaskOption;
     }
 
-    public interface IGruntTaskNotificationService : IReferenceAssemblyNotificationService, IEmbeddedResourceNotificationService,
-        IReferenceSourceLibraryNotificationService, IGruntTaskOptionNotificationService
+    public interface IGrawlTaskNotificationService : IReferenceAssemblyNotificationService, IEmbeddedResourceNotificationService,
+        IReferenceSourceLibraryNotificationService, IGrawlTaskOptionNotificationService
     {
-        event EventHandler<GruntTask> OnCreateGruntTask;
-        event EventHandler<GruntTask> OnEditGruntTask;
-        event EventHandler<int> OnDeleteGruntTask;
+        event EventHandler<GrawlTask> OnCreateGrawlTask;
+        event EventHandler<GrawlTask> OnEditGrawlTask;
+        event EventHandler<int> OnDeleteGrawlTask;
     }
 
-    public interface IGruntCommandNotificationService
+    public interface IGrawlCommandNotificationService
     {
-        event EventHandler<GruntCommand> OnCreateGruntCommand;
-        event EventHandler<GruntCommand> OnEditGruntCommand;
-        event EventHandler<int> OnDeleteGruntCommand;
-        Task NotifyCreateGruntCommand(object sender, GruntCommand command);
-        Task NotifyEditGruntCommand(object sender, GruntCommand command);
+        event EventHandler<GrawlCommand> OnCreateGrawlCommand;
+        event EventHandler<GrawlCommand> OnEditGrawlCommand;
+        event EventHandler<int> OnDeleteGrawlCommand;
+        Task NotifyCreateGrawlCommand(object sender, GrawlCommand command);
+        Task NotifyEditGrawlCommand(object sender, GrawlCommand command);
     }
 
     public interface ICommandOutputNotificationService
@@ -126,13 +126,13 @@ namespace Covenant.Core
         Task NotifyCreateCommandOutput(object sender, CommandOutput output);
     }
 
-    public interface IGruntTaskingNotificationService
+    public interface IGrawlTaskingNotificationService
     {
-        event EventHandler<GruntTasking> OnCreateGruntTasking;
-        event EventHandler<GruntTasking> OnEditGruntTasking;
-        event EventHandler<int> OnDeleteGruntTasking;
-        Task NotifyCreateGruntTasking(object sender, GruntTasking tasking);
-        Task NotifyEditGruntTasking(object sender, GruntTasking tasking);
+        event EventHandler<GrawlTasking> OnCreateGrawlTasking;
+        event EventHandler<GrawlTasking> OnEditGrawlTasking;
+        event EventHandler<int> OnDeleteGrawlTasking;
+        Task NotifyCreateGrawlTasking(object sender, GrawlTasking tasking);
+        Task NotifyEditGrawlTasking(object sender, GrawlTasking tasking);
     }
 
     public interface ICredentialNotificationService
@@ -161,8 +161,8 @@ namespace Covenant.Core
         event EventHandler<Listener> OnCreateListener;
         event EventHandler<Listener> OnEditListener;
         event EventHandler<int> OnDeleteListener;
-        event EventHandler<Grunt> OnNotifyListener;
-        Task NotifyNotifyListener(object sender, Grunt grunt);
+        event EventHandler<Grawl> OnNotifyListener;
+        Task NotifyNotifyListener(object sender, Grawl grawl);
         Task NotifyCreateListener(object sender, Listener listener);
         Task NotifyEditListener(object sender, Listener listener);
     }
@@ -188,9 +188,9 @@ namespace Covenant.Core
         event EventHandler<int> OnDeleteLauncher;
     }
 
-    public interface INotificationService : ICovenantUserNotificationService, IIdentityRoleNotificationService, IIdentityUserRoleNotificationService, IThemeNotificationService,
-        IEventNotificationService, IImplantTemplateNotificationService, IGruntNotificationService, IGruntTaskNotificationService,
-        IGruntCommandNotificationService, ICommandOutputNotificationService, IGruntTaskingNotificationService,
+    public interface INotificationService : IEasyPeasyUserNotificationService, IIdentityRoleNotificationService, IIdentityUserRoleNotificationService, IThemeNotificationService,
+        IEventNotificationService, IImplantTemplateNotificationService, IGrawlNotificationService, IGrawlTaskNotificationService,
+        IGrawlCommandNotificationService, ICommandOutputNotificationService, IGrawlTaskingNotificationService,
         ICredentialNotificationService, IIndicatorNotificationService, IListenerNotificationService, IProfileNotificationService,
         IHostedFileNotificationService, ILauncherNotificationService
     {
@@ -199,24 +199,24 @@ namespace Covenant.Core
 
     public class NotificationService : INotificationService
     {
-        private readonly IHubContext<GruntHub> _gruntHub;
+        private readonly IHubContext<GrawlHub> _grawlHub;
         private readonly IHubContext<EventHub> _eventHub;
-        public NotificationService(IHubContext<GruntHub> grunthub, IHubContext<EventHub> eventhub)
+        public NotificationService(IHubContext<GrawlHub> grawlhub, IHubContext<EventHub> eventhub)
         {
-            _gruntHub = grunthub;
+            _grawlHub = grawlhub;
             _eventHub = eventhub;
-            this.OnNotifyListener += async (sender, egressGrunt) =>
+            this.OnNotifyListener += async (sender, egressGrawl) =>
             {
-                await _gruntHub.Clients.Group(egressGrunt.Listener.GUID).SendAsync("NotifyListener", egressGrunt.GUID);
+                await _grawlHub.Clients.Group(egressGrawl.Listener.ANOTHERID).SendAsync("NotifyListener", egressGrawl.ANOTHERID);
             };
             this.OnCreateEvent += async (sender, theEvent) => {
                 await _eventHub.Clients.Group(theEvent.Context).SendAsync("ReceiveEvent", theEvent);
             };
         }
 
-        public event EventHandler<CovenantUser> OnCreateCovenantUser = delegate { };
-        public event EventHandler<CovenantUser> OnEditCovenantUser = delegate { };
-        public event EventHandler<string> OnDeleteCovenantUser = delegate { };
+        public event EventHandler<EasyPeasyUser> OnCreateEasyPeasyUser = delegate { };
+        public event EventHandler<EasyPeasyUser> OnEditEasyPeasyUser = delegate { };
+        public event EventHandler<string> OnDeleteEasyPeasyUser = delegate { };
         public event EventHandler<IdentityRole> OnCreateIdentityRole = delegate { };
         public event EventHandler<IdentityRole> OnEditIdentityRole = delegate { };
         public event EventHandler<string> OnDeleteIdentityRole = delegate { };
@@ -233,9 +233,9 @@ namespace Covenant.Core
         public event EventHandler<ImplantTemplate> OnCreateImplantTemplate = delegate { };
         public event EventHandler<ImplantTemplate> OnEditImplantTemplate = delegate { };
         public event EventHandler<int> OnDeleteImplantTemplate = delegate { };
-        public event EventHandler<Grunt> OnCreateGrunt = delegate { };
-        public event EventHandler<Grunt> OnEditGrunt = delegate { };
-        public event EventHandler<int> OnDeleteGrunt = delegate { };
+        public event EventHandler<Grawl> OnCreateGrawl = delegate { };
+        public event EventHandler<Grawl> OnEditGrawl = delegate { };
+        public event EventHandler<int> OnDeleteGrawl = delegate { };
         public event EventHandler<ReferenceAssembly> OnCreateReferenceAssembly = delegate { };
         public event EventHandler<ReferenceAssembly> OnEditReferenceAssembly = delegate { };
         public event EventHandler<int> OnDeleteReferenceAssembly = delegate { };
@@ -245,21 +245,21 @@ namespace Covenant.Core
         public event EventHandler<ReferenceSourceLibrary> OnCreateReferenceSourceLibrary = delegate { };
         public event EventHandler<ReferenceSourceLibrary> OnEditReferenceSourceLibrary = delegate { };
         public event EventHandler<int> OnDeleteReferenceSourceLibrary = delegate { };
-        public event EventHandler<GruntTaskOption> OnCreateGruntTaskOption = delegate { };
-        public event EventHandler<GruntTaskOption> OnEditGruntTaskOption = delegate { };
-        public event EventHandler<int> OnDeleteGruntTaskOption = delegate { };
-        public event EventHandler<GruntTask> OnCreateGruntTask = delegate { };
-        public event EventHandler<GruntTask> OnEditGruntTask = delegate { };
-        public event EventHandler<int> OnDeleteGruntTask = delegate { };
-        public event EventHandler<GruntCommand> OnCreateGruntCommand = delegate { };
-        public event EventHandler<GruntCommand> OnEditGruntCommand = delegate { };
-        public event EventHandler<int> OnDeleteGruntCommand = delegate { };
+        public event EventHandler<GrawlTaskOption> OnCreateGrawlTaskOption = delegate { };
+        public event EventHandler<GrawlTaskOption> OnEditGrawlTaskOption = delegate { };
+        public event EventHandler<int> OnDeleteGrawlTaskOption = delegate { };
+        public event EventHandler<GrawlTask> OnCreateGrawlTask = delegate { };
+        public event EventHandler<GrawlTask> OnEditGrawlTask = delegate { };
+        public event EventHandler<int> OnDeleteGrawlTask = delegate { };
+        public event EventHandler<GrawlCommand> OnCreateGrawlCommand = delegate { };
+        public event EventHandler<GrawlCommand> OnEditGrawlCommand = delegate { };
+        public event EventHandler<int> OnDeleteGrawlCommand = delegate { };
         public event EventHandler<CommandOutput> OnCreateCommandOutput = delegate { };
         public event EventHandler<CommandOutput> OnEditCommandOutput = delegate { };
         public event EventHandler<int> OnDeleteCommandOutput = delegate { };
-        public event EventHandler<GruntTasking> OnCreateGruntTasking = delegate { };
-        public event EventHandler<GruntTasking> OnEditGruntTasking = delegate { };
-        public event EventHandler<int> OnDeleteGruntTasking = delegate { };
+        public event EventHandler<GrawlTasking> OnCreateGrawlTasking = delegate { };
+        public event EventHandler<GrawlTasking> OnEditGrawlTasking = delegate { };
+        public event EventHandler<int> OnDeleteGrawlTasking = delegate { };
         public event EventHandler<CapturedCredential> OnCreateCapturedCredential = delegate { };
         public event EventHandler<CapturedCredential> OnEditCapturedCredential = delegate { };
         public event EventHandler<int> OnDeleteCapturedCredential = delegate { };
@@ -272,7 +272,7 @@ namespace Covenant.Core
         public event EventHandler<Listener> OnCreateListener = delegate { };
         public event EventHandler<Listener> OnEditListener = delegate { };
         public event EventHandler<int> OnDeleteListener = delegate { };
-        public event EventHandler<Grunt> OnNotifyListener = delegate { };
+        public event EventHandler<Grawl> OnNotifyListener = delegate { };
         public event EventHandler<Profile> OnCreateProfile = delegate { };
         public event EventHandler<Profile> OnEditProfile = delegate { };
         public event EventHandler<int> OnDeleteProfile = delegate { };
@@ -282,9 +282,9 @@ namespace Covenant.Core
         public event EventHandler<Launcher> OnCreateLauncher = delegate { };
         public event EventHandler<Launcher> OnEditLauncher = delegate { };
         public event EventHandler<int> OnDeleteLauncher = delegate { };
-        public async Task NotifyCreateCovenantUser(object sender, CovenantUser user) { await Task.Run(() => this.OnCreateCovenantUser(sender, user)); }
-        public async Task NotifyEditCovenantUser(object sender, CovenantUser user) { await Task.Run(() => this.OnEditCovenantUser(sender, user)); }
-        public async Task NotifyDeleteCovenantUser(object sender, string id) { await Task.Run(() => this.OnDeleteCovenantUser(sender, id)); }
+        public async Task NotifyCreateEasyPeasyUser(object sender, EasyPeasyUser user) { await Task.Run(() => this.OnCreateEasyPeasyUser(sender, user)); }
+        public async Task NotifyEditEasyPeasyUser(object sender, EasyPeasyUser user) { await Task.Run(() => this.OnEditEasyPeasyUser(sender, user)); }
+        public async Task NotifyDeleteEasyPeasyUser(object sender, string id) { await Task.Run(() => this.OnDeleteEasyPeasyUser(sender, id)); }
 
         public async Task NotifyCreateTheme(object sender, Theme theme) { await Task.Run(() => this.OnCreateTheme(sender, theme)); }
         public async Task NotifyEditTheme(object sender, Theme theme) { await Task.Run(() => this.OnEditTheme(sender, theme)); }
@@ -292,19 +292,19 @@ namespace Covenant.Core
 
         public async Task NotifyCreateEvent(object sender, Event anEvent) { await Task.Run(() => this.OnCreateEvent(sender, anEvent)); }
 
-        public async Task NotifyCreateGrunt(object sender, Grunt grunt) { await Task.Run(() => this.OnCreateGrunt(sender, grunt)); }
-        public async Task NotifyEditGrunt(object sender, Grunt grunt) { await Task.Run(() => this.OnEditGrunt(sender, grunt)); }
+        public async Task NotifyCreateGrawl(object sender, Grawl grawl) { await Task.Run(() => this.OnCreateGrawl(sender, grawl)); }
+        public async Task NotifyEditGrawl(object sender, Grawl grawl) { await Task.Run(() => this.OnEditGrawl(sender, grawl)); }
 
-        public async Task NotifyCreateGruntCommand(object sender, GruntCommand command) { await Task.Run(() => this.OnCreateGruntCommand(sender, command)); }
-        public async Task NotifyEditGruntCommand(object sender, GruntCommand command) { await Task.Run(() => this.OnEditGruntCommand(sender, command)); }
+        public async Task NotifyCreateGrawlCommand(object sender, GrawlCommand command) { await Task.Run(() => this.OnCreateGrawlCommand(sender, command)); }
+        public async Task NotifyEditGrawlCommand(object sender, GrawlCommand command) { await Task.Run(() => this.OnEditGrawlCommand(sender, command)); }
 
         public async Task NotifyCreateCommandOutput(object sender, CommandOutput output) { await Task.Run(() => this.OnCreateCommandOutput(sender, output)); }
         public async Task NotifyEditCommandOutput(object sender, CommandOutput output) { await Task.Run(() => this.OnEditCommandOutput(sender, output)); }
 
-        public async Task NotifyCreateGruntTasking(object sender, GruntTasking tasking) { await Task.Run(() => this.OnCreateGruntTasking(sender, tasking)); }
-        public async Task NotifyEditGruntTasking(object sender, GruntTasking tasking) { await Task.Run(() => this.OnEditGruntTasking(sender, tasking)); }
+        public async Task NotifyCreateGrawlTasking(object sender, GrawlTasking tasking) { await Task.Run(() => this.OnCreateGrawlTasking(sender, tasking)); }
+        public async Task NotifyEditGrawlTasking(object sender, GrawlTasking tasking) { await Task.Run(() => this.OnEditGrawlTasking(sender, tasking)); }
 
-        public async Task NotifyNotifyListener(object sender, Grunt grunt) { await Task.Run(() => this.OnNotifyListener(sender, grunt)); }
+        public async Task NotifyNotifyListener(object sender, Grawl grawl) { await Task.Run(() => this.OnNotifyListener(sender, grawl)); }
 
         public async Task NotifyCreateListener(object sender, Listener listener) { await Task.Run(() => this.OnCreateListener(sender, listener)); }
         public async Task NotifyEditListener(object sender, Listener listener) { await Task.Run(() => this.OnEditListener(sender, listener)); }

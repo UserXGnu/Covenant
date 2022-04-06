@@ -4,7 +4,7 @@
 // regenerated.
 // </auto-generated>
 
-namespace Covenant.API.Models
+namespace EasyPeasy.API.Models
 {
     using Newtonsoft.Json;
     using System.Linq;

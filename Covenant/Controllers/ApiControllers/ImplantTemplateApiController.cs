@@ -1,5 +1,5 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System.Threading.Tasks;
@@ -8,17 +8,17 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-using Covenant.Core;
-using Covenant.Models.Grunts;
+using EasyPeasy.Core;
+using EasyPeasy.Models.Grawls;
 
-namespace Covenant.Controllers
+namespace EasyPeasy.Controllers
 {
     [ApiController, Route("api/implanttemplates"), Authorize(Policy = "RequireJwtBearer")]
     public class ImplantTemplateApiController : Controller
     {
-        private readonly ICovenantService _service;
+        private readonly IEasyPeasyService _service;
 
-        public ImplantTemplateApiController(ICovenantService service)
+        public ImplantTemplateApiController(IEasyPeasyService service)
         {
             _service = service;
         }

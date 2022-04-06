@@ -1,5 +1,5 @@
 ﻿# Author: Ryan Cobb (@cobbr_io)
-# Project: Covenant (https://github.com/cobbr/Covenant)
+# Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 # License: GNU GPLv3
 
 Name: DefaultBridgeProfile
@@ -17,9 +17,9 @@ MessageTransform: |-
         }
     }
 ReadFormat: |-
-    {DATA},{GUID}
+    {DATA},{ANOTHERID}
 WriteFormat: |-
-    {DATA},{GUID}
+    {DATA},{ANOTHERID}
 BridgeMessengerCode: |-
     public enum MessageType
     {
@@ -55,9 +55,9 @@ BridgeMessengerCode: |-
         public string Identifier { get; set; } = "";
         public string Authenticator { get; set; } = "";
 
-        public BridgeMessenger(string CovenantURI, string Identifier, string WriteFormat)
+        public BridgeMessenger(string EasyPeasyURI, string Identifier, string WriteFormat)
         {
-            this.CovenantURI = CovenantURI;
+            this.EasyPeasyURI = EasyPeasyURI;
             this.Identifier = Identifier;
             // TODO
         }

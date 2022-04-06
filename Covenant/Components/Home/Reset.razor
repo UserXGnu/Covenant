@@ -1,0 +1,119 @@
+@page "/home/reset"
+@attribute [Authorize(Roles = "Administrator")]
+@inherits OwningComponentBase<IEasyPeasyService>
+@implements IDisposable
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using EasyPeasy.Core
+@using EasyPeasy.Models.Grawls
+@using EasyPeasy.Models.Listeners
+@using EasyPeasy.Components.Listeners
+@using EasyPeasy.Components.Grawls
+@using EasyPeasy.Components.GrawlTaskings
+@using EasyPeasy.Models.EasyPeasy
+@using EasyPeasy.Models.Indicators
+@using Microsoft.AspNetCore.Identity
+@using System.Threading
+@using System.Collections.Concurrent
+@inject ConcurrentDictionary<int, CancellationTokenSource> ListenerCancellationTokens
+@inject RoleManager<IdentityRole> RoleManager
+@inject EasyPeasyContext EasyPeasyContext
+@inject INotificationService INotificationService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<EasyPeasyUser> UserManager
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3">
+    <h1 class="h2">Reset EasyPeasy</h1>
+</div>
+
+<h4><font color="red">Caution !!!</font></h4>
+<div>
+    By clicking the button below, you will reset EasyPeasy to a new configuration.
+    You will delete:
+    <ul>
+        <li>All grawls</li>
+        <li>All taskings</li>
+        <li>All indicators</li>
+    </ul>
+</div>
+<button type="button" class="btn btn-primary" @onclick="ResetAll">Reset EasyPeasy</button>
+
+@code {
+    
+    [Parameter]
+    public List<EasyPeasyUser> EasyPeasyUsers { get; set; }
+
+    [Parameter]
+    public List<Grawl> Grawls { get; set; }
+
+    [Parameter]
+    public List<Listener> Listeners { get; set; }
+
+    [Parameter]
+    public List<GrawlTasking> GrawlTaskings { get; set; }
+
+    [Parameter]
+    public List<ImplantTemplate> ImplantTemplates { get; set; }
+
+    [Parameter]
+    public List<Indicator> Indicators { get; set; }
+
+    [Parameter]
+    public List<Profile> Profiles { get; set; }
+        
+    protected override async Task OnInitializedAsync()
+    {
+        this.Grawls = this.Grawls ?? (await Service.GetGrawls()).ToList();
+        this.Listeners = this.Listeners ?? (await Service.GetListeners()).ToList();
+        this.GrawlTaskings = this.GrawlTaskings ?? (await Service.GetGrawlTaskings()).ToList();
+        this.EasyPeasyUsers = this.EasyPeasyUsers ?? (await Service.GetUsers()).ToList();
+        this.ImplantTemplates = this.ImplantTemplates ?? (await Service.GetImplantTemplates()).ToList();
+        this.Indicators = this.Indicators ?? (await Service.GetIndicators()).ToList();
+        this.Profiles = this.Profiles ?? (await Service.GetProfiles()).ToList();
+    }
+
+    private EasyPeasyUser GetUser()
+    {
+        Task<AuthenticationState> t1 = AuthenticationStateProvider.GetAuthenticationStateAsync();
+        t1.Wait();
+        Task<EasyPeasyUser> t2 = UserManager.GetUserAsync(t1.Result.User);
+        t2.Wait();
+        return t2.Result;
+    }
+
+    private async Task ResetAll() {
+
+        foreach (Grawl grawl in this.Grawls)
+        {
+            Console.WriteLine("Deleting grawl: " + grawl.Name);
+            await Service.DeleteGrawl(grawl.Id);
+        }
+
+        foreach (GrawlTasking tasking in this.GrawlTaskings)
+        {
+            Console.WriteLine("Deleting tasking: " + tasking.Name);
+            await Service.DeleteGrawlTasking(tasking.Id);
+        }
+        
+        foreach (ImplantTemplate template in this.ImplantTemplates)
+        {
+            Console.WriteLine("Deleting template: " + template.Name);
+            await Service.DeleteImplantTemplate(template.Id);
+        }
+        
+        foreach (Indicator indicator in this.Indicators)
+        {
+            Console.WriteLine("Deleting indicator: " + indicator.Id);
+            await Service.DeleteIndicator(indicator.Id);
+        }
+
+        Console.WriteLine("Initializing the database from scratch");
+
+        await DbInitializer.InitializeImplantTemplates(Service, EasyPeasyContext);
+        await DbInitializer.InitializeLaunchers(Service, EasyPeasyContext);
+        await DbInitializer.InitializeTasks(Service, EasyPeasyContext);
+
+        NavigationManager.NavigateTo("/");
+    }
+}

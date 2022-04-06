@@ -1,10 +1,10 @@
 ﻿@page "/covenantuser/login"
 @using Microsoft.AspNetCore.Identity
-@using Covenant.Core
-@using Covenant.Models.Covenant
-@inject UserManager<CovenantUser> UserManager
+@using EasyPeasy.Core
+@using EasyPeasy.Models.EasyPeasy
+@inject UserManager<EasyPeasyUser> UserManager
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@model Covenant.Pages.LoginModel
+@model EasyPeasy.Pages.LoginModel
 @{
     Layout = "_LoginLayout";
 }
@@ -15,19 +15,20 @@
     {
         <form method="post" class="form-signin">
             <h1 class="h5 text-white">Register Initial User</h1>
-            <input asp-for="CovenantUserRegister.UserName" class="form-control mb-3" placeholder="Username" required autofocus>
-            <input asp-for="CovenantUserRegister.Password" class="form-control" placeholder="Password" type="password" required>
-            <input asp-for="CovenantUserRegister.ConfirmPassword" class="form-control mb-3" placeholder="Confirm Password" type="password" required>
+            <input asp-for="EasyPeasyUserRegister.UserName" class="form-control mb-3" placeholder="Username" required autofocus>
+            <input asp-for="EasyPeasyUserRegister.Password" class="form-control" placeholder="Password" type="password" required>
+            <input asp-for="EasyPeasyUserRegister.ConfirmPassword" class="form-control mb-3" placeholder="Confirm Password" type="password" required>
             <button type="submit" class="btn btn-lg btn-outline-primary btn-block">Register</button>
         </form>
     }
     else
     {
         <form method="post" class="form-signin">
-            <input asp-for="CovenantUserRegister.UserName" class="form-control" placeholder="Username" required autofocus>
-            <input asp-for="CovenantUserRegister.Password" class="form-control mb-3" placeholder="Password" type="password" required>
-            <input asp-for="CovenantUserRegister.ConfirmPassword" value="login" class="form-control" hidden />
+            <input asp-for="EasyPeasyUserRegister.UserName" class="form-control" placeholder="Username" required autofocus>
+            <input asp-for="EasyPeasyUserRegister.Password" class="form-control mb-3" placeholder="Password" type="password" required>
+            <input asp-for="EasyPeasyUserRegister.ConfirmPassword" value="login" class="form-control" hidden />
             <button type="submit" class="btn btn-lg btn-outline-primary btn-block">Login</button>
         </form>
     }
+    <center><font color='white'><p><b>Remember:</br>The strenght of the wolf is the pack and the strenght of the pack is the wolf.</b></p></font></center>
 </div>

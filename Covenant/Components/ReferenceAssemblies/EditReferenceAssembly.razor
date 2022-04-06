@@ -1,9 +1,9 @@
 ﻿@page "/referenceassembly/edit/{ReferenceAssemblyId:int}"
 @attribute [Authorize(Roles = "User, Administrator")]
-@inherits OwningComponentBase<ICovenantService>
+@inherits OwningComponentBase<IEasyPeasyService>
 
-@using Covenant.Core
-@using Covenant.Models.Grunts
+@using EasyPeasy.Core
+@using EasyPeasy.Models.Grawls
 @inject NavigationManager NavigationManager
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap pb-2 mb-3">

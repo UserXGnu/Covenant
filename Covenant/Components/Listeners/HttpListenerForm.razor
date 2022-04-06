@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms
 @using System.IO
 @using System.Linq
-@using Covenant.Models.Listeners
+@using EasyPeasy.Models.Listeners
 
 @using BlazorInputFile
 
@@ -88,7 +88,7 @@
 
         <div class="form-group col-md-6 cert-div" hidden="@(!Listener.UseSSL)">
             <label for="SSLCertificatePassword">SSLCertificatePassword</label>
-            <input id="SSLCertificatePassword" name="SSLCertificatePassword"
+            <input type="password" id="SSLCertificatePassword" name="SSLCertificatePassword"
                     @bind="Listener.SSLCertificatePassword" disabled="@Disabled" class="form-control form-control-sm">
             <div class="text-danger"><ValidationMessage For="() => Listener.SSLCertificatePassword" /></div>
         </div>

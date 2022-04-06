@@ -1,14 +1,14 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-using Covenant.Models.Listeners;
+using EasyPeasy.Models.Listeners;
 
-namespace Covenant.Models.Launchers
+namespace EasyPeasy.Models.Launchers
 {
     public class Regsvr32Launcher : ScriptletLauncher
     {
@@ -19,7 +19,7 @@ namespace Covenant.Models.Launchers
         {
             this.Name = "Regsvr32";
             this.Type = LauncherType.Regsvr32;
-            this.Description = "Uses regsvr32.exe to launch a Grunt using a COM activated Delegate and ActiveXObjects (ala DotNetToJScript). Please note that DotNetToJScript-based launchers may not work on Windows 10 and Windows Server 2016.";
+            this.Description = "Uses regsvr32.exe to launch a Grawl using a COM activated Delegate and ActiveXObjects (ala DotNetToJScript). Please note that DotNetToJScript-based launchers may not work on Windows 10 and Windows Server 2016.";
             this.ScriptType = ScriptletType.Scriptlet;
             this.OutputKind = OutputKind.DynamicallyLinkedLibrary;
             this.CompressStager = false;

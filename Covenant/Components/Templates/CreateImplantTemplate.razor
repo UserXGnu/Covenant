@@ -1,10 +1,14 @@
 ﻿@page "/template/create"
 @attribute [Authorize(Roles = "User, Administrator")]
-@inherits OwningComponentBase<ICovenantService>
+@inherits OwningComponentBase<IEasyPeasyService>
 
 @using Microsoft.JSInterop
-@using Covenant.Core
-@using Covenant.Models.Grunts
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+
+@using EasyPeasy.Core
+@using EasyPeasy.Models.Grawls
+@using EasyPeasy.Models.EasyPeasy
 @inject IJSRuntime IJSRuntime
 @inject NavigationManager NavigationManager
 
@@ -15,10 +19,19 @@
 <ImplantTemplateForm ImplantTemplate="ImplantTemplate" OnSubmit="OnCreate" SubmitIcon="plus" SubmitLabel="Create" />
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; }
+
+    private EasyPeasyUser CurrentUser { get; set; }
+    private IdentityRole AdministratorRole { get; set; }
+
     public ImplantTemplate ImplantTemplate { get; set; } = new ImplantTemplate();
 
     private async Task OnCreate(ImplantTemplate template)
     {
+        AdministratorRole = await Service.GetRoleByName("Adminsitrator");
+        CurrentUser = await Service.GetCurrentUser((await AuthenticationState).User);
+        if (!UserInRole(CurrentUser, AdministratorRole.Id)) { return; }
         try
         {
             await Service.CreateImplantTemplate(template);
@@ -29,4 +42,17 @@
             // return RedirectToAction(nameof(Index));
         }
     }
+    private bool UserInRole(EasyPeasyUser user, string role)
+    {
+        try
+        {
+            Service.GetUserRole(user.Id, role).WaitTask();
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
 }

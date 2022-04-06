@@ -1,11 +1,11 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System.Text;
 using System.Security.Cryptography;
 
-namespace Covenant.Core.Encryption
+namespace EasyPeasy.Core.Encryption
 {
     public static class Utilities
     {

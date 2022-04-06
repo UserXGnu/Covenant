@@ -1,5 +1,5 @@
 ﻿// Author: Ryan Cobb (@cobbr_io)
-// Project: Covenant (https://github.com/cobbr/Covenant)
+// Project: EasyPeasy (https://github.com/cobbr/EasyPeasy)
 // License: GNU GPLv3
 
 using System;
@@ -14,17 +14,17 @@ using Microsoft.AspNetCore.Identity;
 
 using YamlDotNet.Serialization;
 
-using Covenant.Models;
-using Covenant.Models.Covenant;
-using Covenant.Models.Launchers;
-using Covenant.Models.Listeners;
-using Covenant.Models.Grunts;
+using EasyPeasy.Models;
+using EasyPeasy.Models.EasyPeasy;
+using EasyPeasy.Models.Launchers;
+using EasyPeasy.Models.Listeners;
+using EasyPeasy.Models.Grawls;
 
-namespace Covenant.Core
+namespace EasyPeasy.Core
 {
     public static class DbInitializer
     {
-        public async static Task Initialize(ICovenantService service, CovenantContext context, RoleManager<IdentityRole> roleManager, ConcurrentDictionary<int, CancellationTokenSource> ListenerCancellationTokens)
+        public async static Task Initialize(IEasyPeasyService service, EasyPeasyContext context, RoleManager<IdentityRole> roleManager, ConcurrentDictionary<int, CancellationTokenSource> ListenerCancellationTokens)
         {
             await InitializeListeners(service, context, ListenerCancellationTokens);
             await InitializeImplantTemplates(service, context);
@@ -34,7 +34,7 @@ namespace Covenant.Core
             await InitializeThemes(context);
         }
 
-        public async static Task InitializeImplantTemplates(ICovenantService service, CovenantContext context)
+        public async static Task InitializeImplantTemplates(IEasyPeasyService service, EasyPeasyContext context)
         {
             if (!context.ImplantTemplates.Any())
             {
@@ -42,7 +42,7 @@ namespace Covenant.Core
                 {
                     new ImplantTemplate
                     {
-                        Name = "GruntHTTP",
+                        Name = "GrawlHTTP",
                         Description = "A Windows implant written in C# that communicates over HTTP.",
                         Language = ImplantLanguage.CSharp,
                         CommType = CommunicationType.HTTP,
@@ -51,7 +51,7 @@ namespace Covenant.Core
                     },
                     new ImplantTemplate
                     {
-                        Name = "GruntSMB",
+                        Name = "GrawlSMB",
                         Description = "A Windows implant written in C# that communicates over SMB.",
                         Language = ImplantLanguage.CSharp,
                         CommType = CommunicationType.SMB,
@@ -60,7 +60,7 @@ namespace Covenant.Core
                     },
                     new ImplantTemplate
                     {
-                        Name = "GruntBridge",
+                        Name = "GrawlBridge",
                         Description = "A customizable implant written in C# that communicates with a custom C2Bridge.",
                         Language = ImplantLanguage.CSharp,
                         CommType = CommunicationType.Bridge,
@@ -84,22 +84,22 @@ namespace Covenant.Core
                     new ListenerTypeImplantTemplate
                     {
                         ListenerType = await service.GetListenerTypeByName("HTTP"),
-                        ImplantTemplate = await service.GetImplantTemplateByName("GruntHTTP")
+                        ImplantTemplate = await service.GetImplantTemplateByName("GrawlHTTP")
                     },
                     new ListenerTypeImplantTemplate
                     {
                         ListenerType = await service.GetListenerTypeByName("HTTP"),
-                        ImplantTemplate = await service.GetImplantTemplateByName("GruntSMB")
+                        ImplantTemplate = await service.GetImplantTemplateByName("GrawlSMB")
                     },
                     new ListenerTypeImplantTemplate
                     {
                         ListenerType = await service.GetListenerTypeByName("Bridge"),
-                        ImplantTemplate = await service.GetImplantTemplateByName("GruntBridge")
+                        ImplantTemplate = await service.GetImplantTemplateByName("GrawlBridge")
                     },
                     new ListenerTypeImplantTemplate
                     {
                         ListenerType = await service.GetListenerTypeByName("Bridge"),
-                        ImplantTemplate = await service.GetImplantTemplateByName("GruntSMB")
+                        ImplantTemplate = await service.GetImplantTemplateByName("GrawlSMB")
                     },
                     new ListenerTypeImplantTemplate
                     {
@@ -110,7 +110,7 @@ namespace Covenant.Core
             }
         }
 
-        public async static Task InitializeListeners(ICovenantService service, CovenantContext context, ConcurrentDictionary<int, CancellationTokenSource> ListenerCancellationTokens)
+        public async static Task InitializeListeners(IEasyPeasyService service, EasyPeasyContext context, ConcurrentDictionary<int, CancellationTokenSource> ListenerCancellationTokens)
         {
             if (!context.ListenerTypes.Any())
             {
@@ -121,7 +121,7 @@ namespace Covenant.Core
             }
             if (!context.Profiles.Any())
             {
-                string[] files = Directory.GetFiles(Common.CovenantProfileDirectory, "*.yaml", SearchOption.AllDirectories);
+                string[] files = Directory.GetFiles(Common.EasyPeasyProfileDirectory, "*.yaml", SearchOption.AllDirectories);
                 HttpProfile[] httpProfiles = files.Where(F => F.Contains("HTTP", StringComparison.CurrentCultureIgnoreCase))
                     .Select(F => HttpProfile.Create(F))
                     .ToArray();
@@ -140,13 +140,14 @@ namespace Covenant.Core
             }
         }
 
-        public async static Task InitializeLaunchers(ICovenantService service, CovenantContext context)
+        public async static Task InitializeLaunchers(IEasyPeasyService service, EasyPeasyContext context)
         {
             if (!context.Launchers.Any())
             {
                 var launchers = new Launcher[]
                 {
                     new BinaryLauncher(),
+                    new ServiceBinaryLauncher(),
                     new ShellCodeLauncher(),
                     new PowerShellLauncher(),
                     new MSBuildLauncher(),
@@ -161,27 +162,27 @@ namespace Covenant.Core
             }
         }
 
-        public async static Task InitializeTasks(ICovenantService service, CovenantContext context)
+        public async static Task InitializeTasks(IEasyPeasyService service, EasyPeasyContext context)
         {
             if (!context.ReferenceAssemblies.Any())
             {
-                List<ReferenceAssembly> ReferenceAssemblies = Directory.GetFiles(Common.CovenantAssemblyReferenceNet35Directory).Select(R =>
+                List<ReferenceAssembly> ReferenceAssemblies = Directory.GetFiles(Common.EasyPeasyAssemblyReferenceNet35Directory).Select(R =>
                 {
                     FileInfo info = new FileInfo(R);
                     return new ReferenceAssembly
                     {
                         Name = info.Name,
-                        Location = info.FullName.Replace(Common.CovenantAssemblyReferenceDirectory, ""),
+                        Location = info.FullName.Replace(Common.EasyPeasyAssemblyReferenceDirectory, ""),
                         DotNetVersion = Common.DotNetVersion.Net35
                     };
                 }).ToList();
-                Directory.GetFiles(Common.CovenantAssemblyReferenceNet40Directory).ToList().ForEach(R =>
+                Directory.GetFiles(Common.EasyPeasyAssemblyReferenceNet40Directory).ToList().ForEach(R =>
                 {
                     FileInfo info = new FileInfo(R);
                     ReferenceAssemblies.Add(new ReferenceAssembly
                     {
                         Name = info.Name,
-                        Location = info.FullName.Replace(Common.CovenantAssemblyReferenceDirectory, ""),
+                        Location = info.FullName.Replace(Common.EasyPeasyAssemblyReferenceDirectory, ""),
                         DotNetVersion = Common.DotNetVersion.Net40
                     });
                 });
@@ -189,13 +190,13 @@ namespace Covenant.Core
             }
             if (!context.EmbeddedResources.Any())
             {
-                EmbeddedResource[] EmbeddedResources = Directory.GetFiles(Common.CovenantEmbeddedResourcesDirectory).Select(R =>
+                EmbeddedResource[] EmbeddedResources = Directory.GetFiles(Common.EasyPeasyEmbeddedResourcesDirectory).Select(R =>
                 {
                     FileInfo info = new FileInfo(R);
                     return new EmbeddedResource
                     {
                         Name = info.Name,
-                        Location = info.FullName.Replace(Common.CovenantEmbeddedResourcesDirectory, "")
+                        Location = info.FullName.Replace(Common.EasyPeasyEmbeddedResourcesDirectory, "")
                     };
                 }).ToArray();
                 await service.CreateEmbeddedResources(EmbeddedResources);
@@ -233,7 +234,7 @@ namespace Covenant.Core
                     // new ReferenceSourceLibrary
                     // {
                     //     Name = "SharpChrome", Description = "SharpChrome is a C# port of some Mimikatz DPAPI functionality targeting Google Chrome.",
-                    //     Location = Common.CovenantReferenceSourceLibraries + "SharpDPAPI" + Path.DirectorySeparatorChar + "SharpChrome" + Path.DirectorySeparatorChar,
+                    //     Location = Common.EasyPeasyReferenceSourceLibraries + "SharpDPAPI" + Path.DirectorySeparatorChar + "SharpChrome" + Path.DirectorySeparatorChar,
                     //     SupportedDotNetVersions = new List<Common.DotNetVersion> { Common.DotNetVersion.Net35, Common.DotNetVersion.Net40 }
                     // },
                     new ReferenceSourceLibrary
@@ -396,20 +397,20 @@ namespace Covenant.Core
             }
             #endregion
             
-            if (!context.GruntTasks.Any())
+            if (!context.GrawlTasks.Any())
             {
-                List<string> files = Directory.GetFiles(Common.CovenantTaskDirectory)
+                List<string> files = Directory.GetFiles(Common.EasyPeasyTaskDirectory)
                     .Where(F => F.EndsWith(".yaml", StringComparison.CurrentCultureIgnoreCase))
                     .ToList();
                 IDeserializer deserializer = new DeserializerBuilder().Build();
                 foreach (string file in files)
                 {
                     string yaml = File.ReadAllText(file);
-                    List<SerializedGruntTask> serialized = deserializer.Deserialize<List<SerializedGruntTask>>(yaml);
-                    List<GruntTask> tasks = serialized.Select(S => new GruntTask().FromSerializedGruntTask(S)).ToList();
-                    foreach (GruntTask task in tasks)
+                    List<SerializedGrawlTask> serialized = deserializer.Deserialize<List<SerializedGrawlTask>>(yaml);
+                    List<GrawlTask> tasks = serialized.Select(S => new GrawlTask().FromSerializedGrawlTask(S)).ToList();
+                    foreach (GrawlTask task in tasks)
                     {
-                        await service.CreateGruntTask(task);
+                        await service.CreateGrawlTask(task);
                     }
                 }
             }
@@ -427,7 +428,7 @@ namespace Covenant.Core
             }
         }
 
-        public async static Task InitializeThemes(CovenantContext context)
+        public async static Task InitializeThemes(EasyPeasyContext context)
         {
             if (!context.Themes.Any())
             {
@@ -436,7 +437,7 @@ namespace Covenant.Core
                     new Theme
                     {
                         Name = "Classic Theme",
-                        Description = "Covenant's standard, default theme.",
+                        Description = "EasyPeasy's standard, default theme.",
 
                         BackgroundColor = "#ffffff",
                         BackgroundTextColor = "#212529",
